@@ -8,7 +8,7 @@ def command_get_mesasurements_sim(x):
     step_size = x[1]
     amplitude = x[0]
     measurements = []
-    steps =[]
+    steps = []
     for step in range(0, 8000, 15):
         steps.append(step)
         measurements.append(np.sin((np.pi / 180) * step * step_size) * amplitude)
