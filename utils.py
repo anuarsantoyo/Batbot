@@ -25,7 +25,7 @@ def command_robot(solution):
 def fitness(measurements, plot=False):
     """
     Calculates fitness score of solution from the measured data
-    :param measurements: np.array of data provided by get_measurements()
+    :param measurements: np.aray of data provided by get_measurements()
     :return: score
     """
     time, values = measurements
@@ -172,7 +172,7 @@ def measurements_to_df(measurement_bytes):
     return pd.DataFrame(dict_list)  # Convert from list to dataframe
 
 
-def read_measurements_df(port='/dev/ttyUSB0', duration=10, calibration=True):
+def read_measurements_df(port='/dev/ttyUSB0', duration=10, calibration=False):
     """
     Obtain measurements of the DAQ for a given duration and process them into a dataframe.
     :param port: path to the port the DAQ is connected to, which can be found with python -m serial.tools.list_ports
@@ -186,4 +186,5 @@ def read_measurements_df(port='/dev/ttyUSB0', duration=10, calibration=True):
         shift['timestamp'] = 0.0
     else:
         shift = 0
-    return measurements_to_df(read_measurements_raw(port=port, duration=duration)) - shift
+    df = measurements_to_df(read_measurements_raw(port=port, duration=duration))
+    return df - shift
