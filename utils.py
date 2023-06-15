@@ -8,7 +8,7 @@ import struct
 import pandas as pd
 
 
-def command_robot(solution):
+def command_prototype(solution):
     """
     This function takes a proposed solution from the CMA optimization and commands the robot run it.
     :param solution: TBD
@@ -21,8 +21,25 @@ def command_robot(solution):
     html = urllib.request.urlopen(f"http://192.168.43.246/${amplitude},{frequency}$")
     print("Sent!")
 
+def command_batbot2dof(solution, ip_address):
+    """
+    This function takes a proposed solution from the CMA optimization and commands the robot run it.
+    :param solution: TBD
+    :return: None
+    """
+    motor_speed, amplitude = solution
+    amplitude = 9*amplitude + 1  # TODO: adapt to batbot2dof
+    #motor_speed = 30 * motor_speed + 120 # denormalization
+    motor_speed = (300)*motor_speed + 950
+    print(f"Sending command to batbot motor speed: {motor_speed}, amplitude: {amplitude}...")
+    try:
+        html = urllib.request.urlopen(f"http://{ip_address}/${motor_speed},{amplitude}!", timeout=1)
+    except TimeoutError:
+        pass
+    print("Sent!")
 
-def fitness(measurements, plot=False):
+
+def fitness_prototype(measurements, plot=False):
     """
     Calculates fitness score of solution from the measured data
     :param measurements: np.aray of data provided by get_measurements()
@@ -42,6 +59,19 @@ def fitness(measurements, plot=False):
         plt.show()
 
     return np.square(error).mean()
+
+def fitness_batbot2dof(measurements, plot=False):
+    """
+    Calculates fitness score of solution from the measured data
+    :param measurements: np.aray of data provided by read_measurements_df()
+    :return: score
+    """
+    if plot == True:
+        measurements.drop('timestamp', axis=1).plot()
+        plt.show()
+
+    return (measurements.drop('timestamp', axis=1)**2).mean().sum()
+
 
 
 def min_max_creator(min_value=210, max_value=970):  # Values experimentally calculated
