@@ -24,7 +24,7 @@ def command_prototype(solution):
 def command_batbot2dof(solution, ip_address):
     """
     This function takes a proposed solution from the CMA optimization and commands the robot run it.
-    :param solution: TBD
+    :param solution: motor_speed and amplitude (in values from [0,1])
     :return: None
     """
     motor_speed, amplitude = solution
@@ -34,6 +34,37 @@ def command_batbot2dof(solution, ip_address):
     print(f"Sending command to batbot motor speed: {motor_speed}, amplitude: {amplitude}...")
     try:
         html = urllib.request.urlopen(f"http://{ip_address}/${motor_speed},{amplitude}!", timeout=1)
+    except TimeoutError:
+        pass
+    print("Sent!")
+
+def command_batbotV1(solution, ip_address):
+    """
+    This function takes a proposed solution from the CMA optimization and commands the robot run it.
+    :param solution: list of proposed solutions [motor, attack_angle, neutral_state, amplitude]
+    :return: None
+    """
+    motor, attack_angle, neutral_state, amplitude = solution
+
+    motor = np.interp(motor, [0, 1], [150, 400])
+    attack_angle = np.interp(attack_angle, [0, 1], [1150, 1450])
+    neutral_state = np.interp(neutral_state, [0, 1], [1213, 1637])
+    amplitude = np.interp(amplitude, [0, 1], [0, 213])
+
+
+
+
+    print(f"Sending command to batbot "
+          f"motor: {motor}, "
+          f"attack angel: {attack_angle}, "
+          f"neutral state: {neutral_state}, "
+          f"amplitude: {amplitude}...")
+
+    try:
+        html = urllib.request.urlopen(f"http://{ip_address}/${motor},"
+                                      f"{attack_angle},"
+                                      f"{neutral_state},"
+                                      f"{amplitude}!", timeout=1)
     except TimeoutError:
         pass
     print("Sent!")
@@ -59,7 +90,17 @@ def fitness_prototype(measurements, plot=False):
         plt.show()
 
     return np.square(error).mean()
+def fitness_batbotV1(measurements, plot=False):
+    """
+    Calculates fitness score of solution from the measured data
+    :param measurements: np.aray of data provided by read_measurements_df()
+    :return: score
+    """
+    if plot == True:
+        measurements.drop('timestamp', axis=1).plot()
+        plt.show()
 
+    return measurements.drop('timestamp', axis=1).mean().sum()
 def fitness_batbot2dof(measurements, plot=False):
     """
     Calculates fitness score of solution from the measured data
@@ -157,7 +198,9 @@ def read_measurements_raw(port='/dev/ttyUSB0', duration=10):
     measurements = []
     start = time.time()
     while time.time() - start < duration:  # Get measurements as long as the elapse time is smaller than the duration
-        ser.write(b'\x01\x03\x00\xc8\x00\x10\xc5\xf8')  # Send command to DAQ to get floats of all channels
+        ser.write(b'\x01\x03\x00\xc8\x00\x10\xc5\xf8')  # Send command to DAQ to get floats of all channels (float)
+        #ser.write(b'\x01\x03\x01\xf4\x00\x10\x04\x08')  # Send command to DAQ to get int of all channels (long int)
+
         # (from DAQ doc)
         measurements.append((time.time(), ser.read(37)))  # Create list of measurements.
         # I specified 37 as those are the bytes expected as my response, this allows me to have a higher sample
@@ -182,6 +225,21 @@ def bytes_to_float(h1, h2, h3, h4):
     ba.append(h4)
     return struct.unpack("!f", ba)[0]
 
+def bytes_to_int(h1, h2, h3, h4):
+    """
+    Convert bytes to float
+    :param h1: first byte
+    :param h2: second byte
+    :param h3: third byte
+    :param h4: fourth byte
+    :return: integer number of the given bytes
+    """
+    ba = bytearray()
+    ba.append(h1)
+    ba.append(h2)
+    ba.append(h3)
+    ba.append(h4)
+    return struct.unpack("!i", ba)[0]
 
 def measurements_to_df(measurement_bytes):
     """
@@ -201,7 +259,6 @@ def measurements_to_df(measurement_bytes):
         dict_list.append(row)  # Append row dict to list
     return pd.DataFrame(dict_list)  # Convert from list to dataframe
 
-
 def read_measurements_df(port='/dev/ttyUSB0', duration=10, calibration=False):
     """
     Obtain measurements of the DAQ for a given duration and process them into a dataframe.
@@ -210,11 +267,16 @@ def read_measurements_df(port='/dev/ttyUSB0', duration=10, calibration=False):
     :param calibration: Boolean stating if a calibration step should be taken, or data should be returned uncalibrated.
     :return: Dataframe with sensor readings.
     """
-    if calibration:  # TODO: Must recheck calibration idea, as when Batbot is mounted it already has a force that
+    if calibration:
+        b = get_sensor_calibration()
+        shift = pd.Series(data=b['data'].to_list(), index=b['index'].to_list())
         # can't be calibrated to zero.
-        shift = measurements_to_df(read_measurements_raw(port=port, duration=1)).drop('timestamp', axis=1).mean()
+        #shift = measurements_to_df(read_measurements_raw(port=port, duration=1)).drop('timestamp', axis=1).mean()
         shift['timestamp'] = 0.0
     else:
         shift = 0
     df = measurements_to_df(read_measurements_raw(port=port, duration=duration))
     return df - shift
+
+def get_sensor_calibration():
+    return pd.read_csv('analysis/sensor_calibration.csv')
