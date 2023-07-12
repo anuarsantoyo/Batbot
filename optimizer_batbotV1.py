@@ -1,92 +1,90 @@
+import pandas as pd
 from utils import *
 import numpy as np
 from cmaes import CMA
 from matplotlib.patches import Ellipse
 import matplotlib.transforms as transforms
-
+import pickle
+import seaborn as sns
 
 # Connection details
-port = "/dev/ttyUSB0"  # Find port using !python -m serial.tools.list_ports
-ip_address = '192.168.111.130'  # Ip address with arduino
+port = "/dev/ttyUSB1"  # Find port using !python -m serial.tools.list_ports
+ip_address = '192.168.164.130'
 
 # Start the CMA optimizer
-pop_size = 10
-optimizer = CMA(mean=np.array([0.5, 0.5]), sigma=0.5, population_size=pop_size, bounds=np.array([[0, 1], [0, 1]]))
+pop_size = 5
+n_generation = 5
+
+save_directory = "experiments/optimizer_batbotV1/data/230711/test3/"
+'''
+file = open(save_directory+'optimizer_9.pickle', 'rb')
+loaded_file = pickle.load(file)
+optimizer = loaded_file['optimizer']
+generation_0 = loaded_file['last_generation'] + 1
+file.close()
+results = pd.read_csv(save_directory+'results.csv')
+'''
+optimizer = CMA(mean=np.array([0.5, 0.5, 0.5, 0.5]),
+                sigma=0.5,
+                population_size=pop_size,
+                bounds=np.array([[0, 1], [0, 1], [0, 1], [0, 1]]))
+results = pd.DataFrame(columns=['Generation', 'Id', 'Score', 'Motor', 'Neutral', 'Amplitude'])
+generation_0 = 0
+
+# df to plot scores
+scores_plot = []
+df_dict_list = []
+
 
 # Loop for all generations
-for generation in range(50):
+for generation in range(generation_0, generation_0+n_generation):
     print("\n")
     print("*"*50)
-    print(f"Generation {generation}")
+    print(f"Generation {generation+1}/{generation_0+n_generation}")
     print("*"*50)
     print("\n")
 
     solutions = []
-    best_idx = 0
-    best_value = np.inf
     for i in range(optimizer.population_size):
         print(f"Test: {i+1}/{pop_size}")
         x = optimizer.ask()
-
+        #x = [0.01832196, 0.42284382, 0.15978612]
         command_batbotV1(x, ip_address)
-        measurements = read_measurements_df(port=port, duration=5, calibration=False)
-        time.sleep(3)
-
-        value = fitness_batbotV1(measurements)
-        if value < best_value:
-            best_value = value
-            best_idx = i
-            best_measurement = measurements
-        solutions.append((x, value))
-        print(f"Result: {value} \n")
-
-
-
-    # Visualization
-    fig, (ax1, ax2) = plt.subplots(2, 1)
-    fig.suptitle(f"Generation Results: {generation}")
-    best_measurement.drop('timestamp', axis=1).plot(ax=ax1)
-
-    x = []
-    y = []
-    c = []
-    for solution in solutions:
-        x.append(solution[0][0])
-        y.append(solution[0][1])
-        c.append(solution[1])
-
-    ax2.scatter(x, y, c=c, cmap='coolwarm')
-    ax2.set(xlabel="Amplitude (pmv)", ylabel="Angular Velocity (dt)", xlim=(0, 1), ylim=(0, 1))
-
-    mean_x, mean_y = optimizer._mean
-    n_std = 0.5
-
-    cov = optimizer._C
-
-    pearson = cov[0, 1]/np.sqrt(cov[0, 0] * cov[1, 1])
-    # Using a special case to obtain the eigenvalues of this
-    # two-dimensional dataset.
-    ell_radius_x = np.sqrt(1 + pearson)
-    ell_radius_y = np.sqrt(1 - pearson)
-    ellipse = Ellipse((0, 0), width=ell_radius_x * 2, height=ell_radius_y * 2, alpha=0.1)
-
-    # Calculating the standard deviation of x from
-    # the squareroot of the variance and multiplying
-    # with the given number of standard deviations.
-    scale_x = np.sqrt(cov[0, 0]) * n_std
-    # calculating the standard deviation of y ...
-    scale_y = np.sqrt(cov[1, 1]) * n_std
-
-    transf = transforms.Affine2D() \
-        .rotate_deg(45) \
-        .scale(scale_x, scale_y) \
-        .translate(mean_x, mean_y)
-
-    ellipse.set_transform(transf + ax2.transData)
-    ax2.add_patch(ellipse)
-    ax2.set_xticks(np.linspace(0, 1, 10), [950, 980, 1010, 1040, 1070, 1100, 1130, 1160, 1190, 2050])
-    ax2.set_yticks(np.linspace(0, 1, 10), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-
-    plt.show()  # savefig(f"./tests/pres_img2/gen_{generation}.png", dpi=600)
+        measurements = read_measurements_df(port=port, duration=5, calibration=True)
+        score = fitness_project(measurements)
+        measurements.to_csv(save_directory + f"{generation}_{i}.csv", index=False)
+        solutions.append((x, score))
+        motor, attack_angle, neutral_state, amplitude = x
+        df_dict_list.append({'Generation': generation,
+                             'Id': i,
+                             'Score': score,
+                             'Motor': motor,
+                             'Angle': attack_angle,
+                             'Neutral': neutral_state,
+                             'Amplitude': amplitude})
+        print(f"Result: {score} \n")
+        time.sleep(7)
 
     optimizer.tell(solutions)
+
+    df = pd.DataFrame(df_dict_list)
+    results = pd.concat([results, df], ignore_index=True)
+    results.to_csv(save_directory + "results.csv", index=False)
+    with open(save_directory+f"optimizer_{generation}.pickle", "wb") as file:
+        pickle.dump({'optimizer': optimizer, 'last_generation': generation}, file)
+
+    # Visualization
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+    pcm = ax.scatter(results['Motor'], results['Neutral'], results['Amplitude'], c=results['Score'])
+    ax.set_xlabel('Motor')
+    ax.set_ylabel('Neutral State')
+    ax.set_zlabel('Amplitude')
+    ax.set_title(f'Generation: {generation}')
+    fig.colorbar(pcm, ax=ax)
+    plt.show()
+
+    print(f'Generations {generation} Optimizers Covariance matrix is now:\n')
+    print(optimizer._C, optimizer._mean)
+    sns.lineplot(data=results, x="Generation", y="Score")
+    plt.show()

@@ -6,8 +6,8 @@ from matplotlib.patches import Ellipse
 import time
 import struct
 import pandas as pd
-
-
+from scipy.signal import savgol_filter
+sensors_col = [f'sensor_{i}' for i in range(1, 7)]
 def command_prototype(solution):
     """
     This function takes a proposed solution from the CMA optimization and commands the robot run it.
@@ -45,15 +45,10 @@ def command_batbotV1(solution, ip_address):
     :return: None
     """
     motor, attack_angle, neutral_state, amplitude = solution
-
-    motor = np.interp(motor, [0, 1], [150, 400])
+    motor = np.interp(motor, [0, 1], [600, 800])
     attack_angle = np.interp(attack_angle, [0, 1], [1150, 1450])
     neutral_state = np.interp(neutral_state, [0, 1], [1213, 1637])
     amplitude = np.interp(amplitude, [0, 1], [0, 213])
-
-
-
-
     print(f"Sending command to batbot "
           f"motor: {motor}, "
           f"attack angel: {attack_angle}, "
@@ -64,11 +59,11 @@ def command_batbotV1(solution, ip_address):
         html = urllib.request.urlopen(f"http://{ip_address}/${motor},"
                                       f"{attack_angle},"
                                       f"{neutral_state},"
-                                      f"{amplitude}!", timeout=1)
+                                      f"{amplitude}!", timeout=3)  # The timeout closes the session and gives the
+        # measurements time to start measuring after the command start
     except TimeoutError:
         pass
     print("Sent!")
-
 
 def fitness_prototype(measurements, plot=False):
     """
@@ -88,19 +83,39 @@ def fitness_prototype(measurements, plot=False):
         plt.xlabel("time")
         plt.ylabel("a*sin(b*time)")
         plt.show()
-
     return np.square(error).mean()
-def fitness_batbotV1(measurements, plot=False):
+
+def fitness_batbotV1(measurements, plot=False, smooth=False):
     """
     Calculates fitness score of solution from the measured data
     :param measurements: np.aray of data provided by read_measurements_df()
+    :param smooth: Boolean station if smoothing using savgol_filter is applied.
     :return: score
     """
-    if plot == True:
+    measurements = measurements.copy()
+    if smooth:
+        y = measurements[sensors_col]
+        measurements[sensors_col] = savgol_filter(y, 10, 3, axis=0)
+    if plot:
         measurements.drop('timestamp', axis=1).plot()
         plt.show()
+    return abs(measurements.drop('timestamp', axis=1).mean().sum())
 
-    return measurements.drop('timestamp', axis=1).mean().sum()
+def fitness_project(measurements):
+    """
+    Calculates the fitness of a measurement slicing it from the back to learn the influence of the tail values and fits
+     a linear function to project the real fitness were the tail values are no influence
+    :param measurements: np.aray of data provided by read_measurements_df()
+    :return: score
+    """
+    scores_avg = []
+    for i in range(1, 200):  # for a 5 seconds test we obtain 320 data, doing the analysis with the las 200 showed to
+        # the most stable
+        scores_avg.append(fitness_batbotV1(measurements[:-i], smooth=True))
+    x = np.arange(len(scores_avg))
+    fit = np.poly1d(np.polyfit(x, scores_avg, 1))
+    return fit(0)
+
 def fitness_batbot2dof(measurements, plot=False):
     """
     Calculates fitness score of solution from the measured data
@@ -267,6 +282,7 @@ def read_measurements_df(port='/dev/ttyUSB0', duration=10, calibration=False):
     :param calibration: Boolean stating if a calibration step should be taken, or data should be returned uncalibrated.
     :return: Dataframe with sensor readings.
     """
+    print('Reading measurements...')
     if calibration:
         b = get_sensor_calibration()
         shift = pd.Series(data=b['data'].to_list(), index=b['index'].to_list())
@@ -276,6 +292,8 @@ def read_measurements_df(port='/dev/ttyUSB0', duration=10, calibration=False):
     else:
         shift = 0
     df = measurements_to_df(read_measurements_raw(port=port, duration=duration))
+    df['timestamp'] = df['timestamp'] - df['timestamp'][0]
+    print('Read!')
     return df - shift
 
 def get_sensor_calibration():
