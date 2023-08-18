@@ -4,6 +4,7 @@ import pca9685
 import pca9685_servo
 import as5048a
 import utime
+from micropython import const
 
 
 # Configuration
@@ -17,20 +18,29 @@ as5048_spi.init(mode=pyb.SPI.MASTER,prescaler=8,bits=8)
 mag = as5048a.AS5048A(as5048_spi, as5048_cs) # readings from 70-110
 
 # Constants
-LEFT_LEG = 0
-RIGHT_LEG = 1
-FOLDER = 2
-FLAPPER = 3
-ATTACK_ANGLE = 4
+LEFT_LEG = const(0)
+RIGHT_LEG = const(1)
+FOLDER = const(2)
+FLAPPER = const(3)
+ATTACK_ANGLE = const(4)
 
 uart = pyb.UART(3, 115200)
+
+# Motors initialization
+pca.duty(FLAPPER, 200)
+servos.position(ATTACK_ANGLE, 110)
+servos.position(FOLDER, 130)
+servos.position(RIGHT_LEG, 100)
+servos.position(LEFT_LEG, 100)
+utime.sleep(3)
 
 while True:
     response = uart.read()  # check what happens if several commands are sent
     if response:
+        print(response)
         data_str = response.decode('utf-8')
         numbers = data_str.split(',')
-        motor, attack_angle, leg_angle, leg_amplitude = [int(num) for num in numbers]      
+        motor, attack_angle, leg_angle, leg_amplitude = [float(num) for num in numbers]      
 # Test#motor = 270#attack_angle = 110#leg_angle = 150#leg_amplitude = 30
         pca.duty(FLAPPER, motor)
         servos.position(ATTACK_ANGLE, attack_angle)

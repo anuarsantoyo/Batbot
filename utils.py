@@ -7,7 +7,9 @@ import time
 import struct
 import pandas as pd
 from scipy.signal import savgol_filter
+
 sensors_col = [f'sensor_{i}' for i in range(1, 7)]
+calibration = pd.read_csv('/home/anuarsantoyo/PycharmProjects/Batbot/analysis/sensor_calibration.csv')
 def command_prototype(solution):
     """
     This function takes a proposed solution from the CMA optimization and commands the robot run it.
@@ -38,7 +40,29 @@ def command_batbot2dof(solution, ip_address):
         pass
     print("Sent!")
 
-def command_batbotV1(solution, ip_address):
+
+def command_batbotV1(solution, port):
+    """
+    This function takes a proposed solution from the CMA optimization and commands the robot run it.
+    :param solution: list of proposed solutions [motor, attack_angle, neutral_state, amplitude]
+    :param port: port of the wireless uart module.
+    :return: None
+    """
+    motor, attack_angle, neutral_state, amplitude = solution
+    motor = np.interp(motor, [0, 1], [260, 280])
+    attack_angle = np.interp(attack_angle, [0, 1], [90, 130])
+    neutral_state = np.interp(neutral_state, [0, 1], [70, 170])
+    amplitude = np.interp(amplitude, [0, 1], [0, 50])
+    print(f"Sending command to batbot "
+          f"motor: {motor}, "
+          f"attack angel: {attack_angle}, "
+          f"neutral state: {neutral_state}, "
+          f"amplitude: {amplitude}...")
+    ser = serial.Serial(port=port, baudrate=115200, bytesize=8, parity='N', stopbits=1)
+    ser.write(str.encode(f'{motor},{attack_angle},{neutral_state},{amplitude}'))
+    print("Sent!")
+
+def command_batbotV1_wifi(solution, ip_address):
     """
     This function takes a proposed solution from the CMA optimization and commands the robot run it.
     :param solution: list of proposed solutions [motor, attack_angle, neutral_state, amplitude]
@@ -297,7 +321,7 @@ def read_measurements_df_oldDAQ(port='/dev/ttyUSB0', duration=10, calibration=Fa
     return df - shift
 
 def get_sensor_calibration():
-    return pd.read_csv('analysis/sensor_calibration.csv')
+    return pd.read_csv('analysis/sensor_calibration_oldDAQ.csv')
 
 def get_one_data(port_obj):
     port_obj.reset_input_buffer()
@@ -312,7 +336,7 @@ def get_one_data(port_obj):
     return ret
 
 
-def read_measurements_df(port, duration=10, sample_interval_ns=20_000_000):
+def read_measurements_df1(port, duration=10, sample_interval_ns=20_000_000):
     uart = serial.Serial(port, 115200, timeout=1)
     t_0 = time.time_ns()
     ret_df = pd.DataFrame(columns=['sensor_1',
@@ -329,7 +353,22 @@ def read_measurements_df(port, duration=10, sample_interval_ns=20_000_000):
         ret_df.loc[i-1] = line
     return ret_df
 
+def read_measurements_df(port, duration=10):
+    uart = serial.Serial(port, 115200, timeout=1)
+    t_0 = time.time()
+    data = []
+    while time.time() - t_0 < duration:
+        data.append((time.time(), get_one_data(uart)))
+        time.sleep(0.001)
 
+    df_list = [{'timestamp': time-data[0][0],
+                'sensor_1':sensors[0] - calibration.loc['sensor_1'][0],
+                'sensor_2':sensors[1] - calibration.loc['sensor_2'][0],
+                'sensor_3':sensors[2] - calibration.loc['sensor_3'][0],
+                'sensor_4':sensors[3] - calibration.loc['sensor_4'][0],
+                'sensor_5':sensors[4] - calibration.loc['sensor_5'][0],
+                'sensor_6':sensors[5] - calibration.loc['sensor_6'][0]} for time, sensors in data]
+    return pd.DataFrame(df_list)
 
 
 

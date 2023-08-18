@@ -8,28 +8,31 @@ import pickle
 import seaborn as sns
 
 # Connection details
-port = "/dev/ttyUSB1"  # Find port using !python -m serial.tools.list_ports
-ip_address = '192.168.164.130'
+daq_port = "/dev/ttyUSB0"  # Find port using !python -m serial.tools.list_ports
+command_port = "/dev/ttyACM0"
+
 
 # Start the CMA optimizer
-pop_size = 5
-n_generation = 5
+pop_size = 10
+n_generation = 10
 
-save_directory = "experiments/optimizer_batbotV1/data/230711/test3/"
-'''
-file = open(save_directory+'optimizer_9.pickle', 'rb')
+save_directory = "experiments/optimizer_batbotV1/data/230817/test1/"
+
+file = open(save_directory+'optimizer_4.pickle', 'rb')
 loaded_file = pickle.load(file)
 optimizer = loaded_file['optimizer']
 generation_0 = loaded_file['last_generation'] + 1
 file.close()
 results = pd.read_csv(save_directory+'results.csv')
+
 '''
 optimizer = CMA(mean=np.array([0.5, 0.5, 0.5, 0.5]),
                 sigma=0.5,
                 population_size=pop_size,
                 bounds=np.array([[0, 1], [0, 1], [0, 1], [0, 1]]))
-results = pd.DataFrame(columns=['Generation', 'Id', 'Score', 'Motor', 'Neutral', 'Amplitude'])
+results = pd.DataFrame(columns=['Generation', 'Id', 'Score', 'Motor', 'Attack', 'Neutral', 'Amplitude'])
 generation_0 = 0
+'''
 
 # df to plot scores
 scores_plot = []
@@ -48,9 +51,8 @@ for generation in range(generation_0, generation_0+n_generation):
     for i in range(optimizer.population_size):
         print(f"Test: {i+1}/{pop_size}")
         x = optimizer.ask()
-        #x = [0.01832196, 0.42284382, 0.15978612]
-        command_batbotV1(x, ip_address)
-        measurements = read_measurements_df(port=port, duration=5, calibration=True)
+        command_batbotV1(x, command_port)
+        measurements = read_measurements_df(port=daq_port, duration=5)
         score = fitness_project(measurements)
         measurements.to_csv(save_directory + f"{generation}_{i}.csv", index=False)
         solutions.append((x, score))
@@ -59,7 +61,7 @@ for generation in range(generation_0, generation_0+n_generation):
                              'Id': i,
                              'Score': score,
                              'Motor': motor,
-                             'Angle': attack_angle,
+                             'Attack': attack_angle,
                              'Neutral': neutral_state,
                              'Amplitude': amplitude})
         print(f"Result: {score} \n")
