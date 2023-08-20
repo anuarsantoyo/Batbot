@@ -78,3 +78,17 @@ while True:
         pca.duty(FLAPPER, 250)  # Stop flapper
         servos.position(FOLDER, degrees = 130)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
