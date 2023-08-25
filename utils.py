@@ -62,6 +62,23 @@ def command_batbotV1(solution, port):
     ser.write(str.encode(f'{motor},{attack_angle},{neutral_state},{amplitude}'))
     print("Sent!")
 
+
+def command_batbotV2_2D(solution, port):
+    """
+    This function takes a proposed solution from the CMA optimization and commands the robot run it.
+    :param solution: list of proposed solutions [motor, attack_angle, neutral_state, amplitude]
+    :param port: port of the wireless uart module.
+    :return: None
+    """
+    motor, attack_angle = solution
+    motor = np.interp(motor, [0, 1], [260, 280])
+    attack_angle = np.interp(attack_angle, [0, 1], [80, 130])
+    print(f"Sending command to batbot "
+          f"motor: {motor}, attack_angle: {attack_angle}")
+    ser = serial.Serial(port=port, baudrate=115200, bytesize=8, parity='N', stopbits=1)
+    ser.write(str.encode(f'{motor},{attack_angle}'))
+    print("Sent!")
+
 def command_batbotV1_wifi(solution, ip_address):
     """
     This function takes a proposed solution from the CMA optimization and commands the robot run it.
@@ -355,6 +372,7 @@ def read_measurements_df1(port, duration=10, sample_interval_ns=20_000_000):
 
 def read_measurements_df(port, duration=10):
     uart = serial.Serial(port, 115200, timeout=1)
+    time.sleep(2)
     t_0 = time.time()
     data = []
     while time.time() - t_0 < duration:
