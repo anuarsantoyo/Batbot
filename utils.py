@@ -71,7 +71,7 @@ def command_batbotV2_2D(solution, port):
     :return: None
     """
     motor, attack_angle = solution
-    motor = np.interp(motor, [0, 1], [260, 280])
+    motor = np.interp(motor, [0, 1], [260, 270])
     attack_angle = np.interp(attack_angle, [0, 1], [80, 130])
     print(f"Sending command to batbot "
           f"motor: {motor}, attack_angle: {attack_angle}")
@@ -138,7 +138,7 @@ def fitness_batbotV1(measurements, plot=False, smooth=False):
         y = measurements[sensors_col]
         measurements[sensors_col] = savgol_filter(y, 10, 3, axis=0)
     if plot:
-        measurements.drop('timestamp', axis=1).plot()
+        measurements.plot(x='timestamp')
         plt.show()
     return abs(measurements.drop('timestamp', axis=1).mean().sum())
 
@@ -372,7 +372,6 @@ def read_measurements_df1(port, duration=10, sample_interval_ns=20_000_000):
 
 def read_measurements_df(port, duration=10):
     uart = serial.Serial(port, 115200, timeout=1)
-    time.sleep(2)
     t_0 = time.time()
     data = []
     while time.time() - t_0 < duration:
@@ -387,7 +386,4 @@ def read_measurements_df(port, duration=10):
                 'sensor_5':sensors[4] - calibration.loc['sensor_5'][0],
                 'sensor_6':sensors[5] - calibration.loc['sensor_6'][0]} for time, sensors in data]
     return pd.DataFrame(df_list)
-
-
-
 
