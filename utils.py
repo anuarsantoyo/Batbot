@@ -73,10 +73,15 @@ def command_batbotV2_2D(solution, port):
     motor, attack_angle = solution
     motor = np.interp(motor, [0, 1], [260, 270])
     attack_angle = np.interp(attack_angle, [0, 1], [80, 130])
+    leg_x = 50
+    leg_y = 90
+    leg_x_amplitude = 0
+    leg_y_amplitude = 0
+    ellipse_angle = 0
     print(f"Sending command to batbot "
           f"motor: {motor}, attack_angle: {attack_angle}")
     ser = serial.Serial(port=port, baudrate=115200, bytesize=8, parity='N', stopbits=1)
-    ser.write(str.encode(f'{motor},{attack_angle}'))
+    ser.write(str.encode(f'{motor},{attack_angle},{leg_x},{leg_y},{leg_x_amplitude},{leg_y_amplitude},{ellipse_angle}'))
     print("Sent!")
 
 def command_batbotV1_wifi(solution, ip_address):

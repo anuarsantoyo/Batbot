@@ -53,8 +53,8 @@ for generation in range(generation_0, generation_0+n_generation):
         x = optimizer.ask()
 
         # command_batbotV1(x, command_port)  TODO:dim
-        x = (0.978048, 0.3806964)
         command_batbotV2_2D(x, command_port)
+
         time.sleep(2)  # To allow the Batbot to reach the attack angle and flapping speed
         measurements = read_measurements_df(port=daq_port, duration=5)
         score = fitness_project(measurements)

@@ -19,16 +19,15 @@ mag = as5048a.AS5048A(as5048_spi, as5048_cs)  # readings from 235-194 -> down-up
 uart = pyb.UART(3, 115200)  # Wireless uart to send commands.
 
 # Constants
-LL_x = 2
-LL_y = 3
 RL_x = 0
 RL_y = 1
+LL_x = 2
+LL_y = 3
 FOLDER = 4
 FLAPPER = 5
 ATTACK = 6
 folded = 160
 extended = 50
-
 
 # Motors initialization
 pca.duty(FLAPPER, 200)
