@@ -6,38 +6,22 @@ from matplotlib.patches import Ellipse
 import matplotlib.transforms as transforms
 import pickle
 import seaborn as sns
+import itertools
+
 
 # Connection details
 daq_port = "/dev/ttyUSB0"  # Find port using !python -m serial.tools.list_ports
 command_port = "/dev/ttyACM1"
 
 
-# Start the CMA optimizer
-pop_size = 10
-n_generation = 50
-
 save_directory = "experiments/optimizer_batbotV2_2D/data/230828/test1/"
-
-load = False
-if load:
-    file = open(save_directory+'optimizer_12.pickle', 'rb')
-    loaded_file = pickle.load(file)
-    optimizer = loaded_file['optimizer']
-    generation_0 = loaded_file['last_generation'] + 1
-    file.close()
-    results = pd.read_csv(save_directory+'results.csv')
-else:
-    optimizer = CMA(mean=np.array([0.5, 0.5]),  # , 0.5, 0.5]), TODO:dim
-                    sigma=0.5,
-                    population_size=pop_size,
-                    bounds=np.array([[0, 1], [0, 1]]))  # , [0, 1], [0, 1]])) TODO:dim
-    results = pd.DataFrame(columns=['Generation', 'Id', 'Score', 'Motor', 'Attack']) #,'Neutral', 'Amplitude'])TODO:dim
-    generation_0 = 0
+results = pd.DataFrame(columns=['Generation', 'Id', 'Score', 'Motor', 'Attack']) #,'Neutral', 'Amplitude'])TODO:dim
+generation_0 = 0
 
 # df to plot scores
 scores_plot = []
 df_dict_list = []
-
+n_generation = 10
 
 # Loop for all generations
 for generation in range(generation_0, generation_0+n_generation):
@@ -48,9 +32,10 @@ for generation in range(generation_0, generation_0+n_generation):
     print("\n")
 
     solutions = []
-    for i in range(optimizer.population_size):
-        print(f"Test: {i+1}/{pop_size}")
-        x = optimizer.ask()
+    for x_0, x_1 in itertools.product([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1], repeat=2):
+        x = (x_0, x_1)
+        print(f"Test: {x}")
+
         command_batbotV2_2D(x, command_port)  #TODO:dim
 
         time.sleep(2)  # To allow the Batbot to reach the attack angle and flapping speed
@@ -60,20 +45,17 @@ for generation in range(generation_0, generation_0+n_generation):
         solutions.append((x, score))
         motor, attack_angle = x  # , neutral_state, amplitude TODO:dim
         df_dict_list.append({'Generation': generation,
-                             'Id': i,
+                             'Id': np.nan,
                              'Score': score,
                              'Motor': motor,
                              'Attack': attack_angle})  # ,'Neutral': neutral_state,'Amplitude': amplitude}) TODO:dim
         print(f"Result: {score} \n")
         time.sleep(1)
 
-    optimizer.tell(solutions)
 
     df = pd.DataFrame(df_dict_list)
     results = pd.concat([results, df], ignore_index=True)
     results.to_csv(save_directory + "results.csv", index=False)
-    with open(save_directory+f"optimizer_{generation}.pickle", "wb") as file:
-        pickle.dump({'optimizer': optimizer, 'last_generation': generation}, file)
 
     # Visualization TODO:dim
     fig = plt.figure()
@@ -84,9 +66,4 @@ for generation in range(generation_0, generation_0+n_generation):
     ax.set_zlabel('Score')
     ax.set_title(f'Generation: {generation}')
     fig.colorbar(pcm, ax=ax)
-    plt.show()
-
-    print(f'Generations {generation} Optimizers Covariance matrix is now:\n')
-    print(optimizer._C, optimizer._mean)
-    sns.lineplot(data=results, x="Generation", y="Score")
     plt.show()
