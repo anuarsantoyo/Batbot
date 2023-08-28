@@ -7,16 +7,16 @@ import utime
 from micropython import const
 import math
 
-
 # Configuration
-i2c = machine.SoftI2C("X9","X10",freq=100000)
+i2c = machine.SoftI2C("X9","X10",freq=100000)  # For PCA
 pca = pca9685.PCA9685(i2c)
 servos = pca9685_servo.Servos(pca)
-as5048_cs = pyb.Pin("X5", pyb.Pin.OUT_PP)
+as5048_cs = pyb.Pin("X5", pyb.Pin.OUT_PP)  # For magnetic encoder (wing angle measurement)
 as5048_cs.high()
 as5048_spi = pyb.SPI(1)
-as5048_spi.init(mode=pyb.SPI.MASTER, prescaler=8, äbits=8)
-mag = as5048a.AS5048A(as5048_spi, as5048_cs)  # readings from 70-110
+as5048_spi.init(mode=pyb.SPI.MASTER, prescaler=8, bits=8)
+mag = as5048a.AS5048A(as5048_spi, as5048_cs)  # readings from 235-194 -> down-up
+uart = pyb.UART(3, 115200)  # Wireless uart to send commands.
 
 # Constants
 LL_x = 2
@@ -29,77 +29,81 @@ ATTACK = 6
 folded = 160
 extended = 50
 
-uart = pyb.UART(3, 115200)
 
 # Motors initialization
-pca.duty(FLAPPER, 100)
-servos.position(ATTACK, 110)
-#servos.position(FOLDER, 100)
-#servos.position(RIGHT_LEG, 100)
-#servos.position(LEFT_LEG, 100)
+pca.duty(FLAPPER, 200)
+servos.position(ATTACK, 120)
+servos.position(FOLDER, extended)
 utime.sleep(3)
 
 while True:
-    response = uart.read()  # check what happens if several commands are sent
+    response = uart.read()  # read command
     if response:
         print(response)
         data_str = response.decode('utf-8')
         numbers = data_str.split(',')
-        leg_y, leg_y_amplitude, leg_x, leg_x_amplitude, ellipse_angle, attack_angle, motor = [float(num) for num in numbers]
-# Test#motor = 270#attack_angle = 110#leg_angle = 150#leg_amplitude = 30
+        motor, attack_angle, leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle \
+            = [float(num) for num in numbers]  # Extract command
+
         pca.duty(FLAPPER, motor)
         servos.position(ATTACK, attack_angle)
         
         start_time = utime.ticks_ms()
-        duration = 10000  # 10 seconds in deciseconds
-        old_angle = mag.read_angle()  #Used to calculate derivative which gives stroke direction
-        
-        while utime.ticks_diff(utime.ticks_ms(), start_time) < duration:
-            utime.sleep(0.001)
+        duration = 7500  # 7.5 seconds
+
+        old_angle = mag.read_angle()  # Used to calculate derivative which gives stroke direction
+        while utime.ticks_diff(utime.ticks_ms(), start_time) < duration:  # Run as long as stated experiment duration
+            utime.sleep(0.001)  #  Used to stabiize the loop, if not added time measurement fails.
             new_angle = mag.read_angle()
-            upstroke = old_angle < new_angle
-            cyc = (new_angle-70)/(110-70)  #down:0 up:1
+            upward = new_angle < old_angle  # Calculate wing beat direction
+            cyc = 1 - (new_angle - 194) / (235 - 194)  # down:0 up:1
+
+            if upward:
+                pi_cyc = math.pi * cyc  # [0,pi]
+            else:
+                pi_cyc = 2 * math.pi - math.pi * cyc  # [pi, 2pi]
 
             if cyc > 0.5:
-                fold = extended  # after half_way up star extending
+                fold = extended  # after halfway up, start extending
             elif cyc < 0.2:
-                fold = folded  # 20% before reaching down start folding
-            elif upstroke:
-                fold = folded  # up-stroke folding
+                fold = folded  # 20% before reaching down, start folding
+            elif upward:
+                fold = folded  #  up-stroke fold
             else:
                 fold = extended  # down-stroke extend
+
+            #servos.position(FOLDER, extended) # uncomment if you want to disable folding
             servos.position(FOLDER, fold)
+            old_angle = new_angle
 
-            if upstroke:
-                pi_cyc = math.pi * cyc
-            else:
-                pi_cyc = 2 * math.pi - math.pi * cyc
-            pi_cyc *= -1
-
-            y_theta = leg_y + leg_y_amplitude * math.sin(-pi_cyc)
-            if y_theta < 30:
+            y_theta = leg_y - leg_y_amplitude * math.cos(pi_cyc)  # Calculate angle from body plane to leg in vertical
+            if y_theta < 30:  # Stops angle from exceeding limit values (also allowing straight trajectories in leg)
                 y_theta = 30
             elif y_theta > 150:
                 y_theta = 150
             LL_y_angle = y_theta
-            RL_y_angle = 180 - y_theta
+            RL_y_angle = 180 - y_theta  # Invert for right leg
 
-            x_theta = leg_x + leg_x_amplitude * math.sin(ellipse_angle * math.pi - pi_cyc)
-            if x_theta < 50:
-                x_theta = 50
+            # Calculate angle from body plane to leg in vertical
+            x_theta = leg_x + leg_x_amplitude * math.sin(pi_cyc + 2 * math.pi * ellipse_angle)
+            if x_theta < 40:
+                x_theta = 40
             elif x_theta > 120:
                 x_theta = 120
+
             RL_x_angle = x_theta
             LL_x_angle = 180 - RL_x_angle
 
+            # Command servos
             servos.position(LL_y, LL_y_angle)
             servos.position(RL_y, RL_y_angle)
 
             servos.position(RL_x, RL_x_angle)
             servos.position(LL_x, LL_x_angle)
-            old_angle = new_angle
-            
+
+            servos.position(ATTACK, attack_angle)
+            pca.duty(FLAPPER, motor)
+
         uart.read()  # in case data was sent while in the loop it is deleted
-        pca.duty(FLAPPER, 100)  # Stop flapper
-        servos.position(FOLDER, degrees=130)
+        pca.duty(FLAPPER, 200)  # Turn off flapper
 

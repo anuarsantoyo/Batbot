@@ -22,9 +22,9 @@ RL_y = 1
 FOLDER = 4
 FLAPPER = 5
 ATTACK = 6
+folded = 160
+extended = 50
 
-cyc = 0
-direction = 1
 
 # Parameters
 leg_y = 90
@@ -34,8 +34,7 @@ leg_x_amplitude = 0
 ellipse_angle = 0.5
 attack_angle = 120
 motor = 250
-folded = 160
-extended = 50
+
 
 # 50-160 extended-folded
 servos.position(ATTACK, attack_angle)
@@ -56,15 +55,12 @@ while True:
         pi_cyc = math.pi*cyc
     else:
         pi_cyc = 2*math.pi - math.pi*cyc
-        
-    #pi_cyc *= -1
+
     
     if cyc>0.5:
         fold = extended # after half way up star extending
     elif cyc<0.2:
         fold = folded # 20% before reaching down start folding
-    #elif old_angle<new_angle:
-    #    fold = 130 # up-stroke folding
     elif upward:
         fold = folded
     else:
