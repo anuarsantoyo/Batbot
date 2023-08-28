@@ -13,14 +13,14 @@ command_port = "/dev/ttyACM1"
 
 
 # Start the CMA optimizer
-pop_size = 3
-n_generation = 2
+pop_size = 5
+n_generation = 87
 
-save_directory = "experiments/optimizer_batbotV2_2D/data/230825/"
+save_directory = "experiments/optimizer_batbotV2_2D/data/230825/test2/"
 
 load = False
 if load:
-    file = open(save_directory+'optimizer.pickle', 'rb')
+    file = open(save_directory+'optimizer_12.pickle', 'rb')
     loaded_file = pickle.load(file)
     optimizer = loaded_file['optimizer']
     generation_0 = loaded_file['last_generation'] + 1
@@ -53,6 +53,7 @@ for generation in range(generation_0, generation_0+n_generation):
         x = optimizer.ask()
 
         # command_batbotV1(x, command_port)  TODO:dim
+        x = (0.978048, 0.3806964)
         command_batbotV2_2D(x, command_port)
         time.sleep(2)  # To allow the Batbot to reach the attack angle and flapping speed
         measurements = read_measurements_df(port=daq_port, duration=5)

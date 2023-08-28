@@ -1,0 +1,12 @@
+In this test we used the V2 of the Batbot. The legs were static and parallel to the body, the wings also were always
+extended, this was because at first I had problems to install the magnetic encoder, but after seeing such good results
+I think it is also good to show the improvement when gradually adding optimizations (folding, leg-flapping).
+For the moment only the motor speed and attack angle were optimized.
+motor = np.interp(motor, [0, 1], [260, 270])
+attack_angle = np.interp(attack_angle, [0, 1], [80, 130])
+
+The results show that the score could be improved by increasing the motor and the optimal angle was found at
+with motor of 0.978048 and attack of 0.3806964.
+
+For some strange reason, the scores jumped to very high levels (compared to initial scores) even though experiments
+runned using the same optimal parameters were done.

@@ -57,7 +57,7 @@ while True:
         servos.position(ATTACK, attack_angle)
         
         start_time = utime.ticks_ms()
-        duration = 15000  # 10 seconds in deciseconds
+        duration = 7500  # 7.5 seconds in deciseconds
 
         while utime.ticks_diff(utime.ticks_ms(), start_time) < duration:
             utime.sleep(0.001)

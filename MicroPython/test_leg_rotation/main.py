@@ -6,7 +6,7 @@ import as5048a
 import time
 import math
 
-i2c = machine.SoftI2C("X9","X10",freq=100000)
+i2c = machine.SoftI2C("X9", "X10", freq=100000)
 pca = pca9685.PCA9685(i2c)
 servos = pca9685_servo.Servos(pca)
 as5048_cs = pyb.Pin("X5", pyb.Pin.OUT_PP)
@@ -32,46 +32,49 @@ leg_y_amplitude = 0
 leg_x = 40  # 50-140
 leg_x_amplitude = 0
 ellipse_angle = 0.5
-attack_angle = 90
-flapper = 110
-motor = 190
+attack_angle = 120
+motor = 250
+folded = 160
+extended = 50
 
 # 50-160 extended-folded
 servos.position(ATTACK, attack_angle)
-pca.duty(FLAPPER, flapper)
+servos.position(FOLDER, folded)
+pca.duty(FLAPPER,200)
+time.sleep(1)
+
+pca.duty(FLAPPER, motor)
+old_angle = mag.read_angle()  # Used to calculate derivative which gives stroke direction
 
 while True:
     time.sleep(0.001)
-    cyc += 0.005*direction
-    if cyc>1:
-        direction = -1
-    elif cyc<0:
-        direction = 1
+    new_angle = mag.read_angle()
+    upward = new_angle < old_angle
+    cyc = 1-(new_angle-194)/(235-194)  # down:0 up:1
     
-    if direction == 1:
+    if upward:
         pi_cyc = math.pi*cyc
     else:
         pi_cyc = 2*math.pi - math.pi*cyc
         
-    pi_cyc *= -1
+    #pi_cyc *= -1
     
     if cyc>0.5:
-        fold = 50 # after half way up star extending
+        fold = extended # after half way up star extending
     elif cyc<0.2:
-        fold = 160 # 20% before reaching down start folding
+        fold = folded # 20% before reaching down start folding
     #elif old_angle<new_angle:
     #    fold = 130 # up-stroke folding
-    elif direction == 1:
-        fold = 160
+    elif upward:
+        fold = folded
     else:
-        fold = 50 # down-stroke extend
+        fold = extended # down-stroke extend
         
-    fold = 50  # TODO: remove
     servos.position(FOLDER, fold)
-
-    print(cyc)
+    old_angle = new_angle
+    print(cyc, new_angle)
     
-    y_theta = leg_y + leg_y_amplitude*math.sin(-pi_cyc)        
+    y_theta = leg_y - leg_y_amplitude*math.cos(pi_cyc)        
     if y_theta<30:
         y_theta = 30
     elif y_theta > 150:
@@ -79,11 +82,12 @@ while True:
     LL_y_angle = y_theta
     RL_y_angle =  180 - y_theta
         
-    x_theta = leg_x + leg_x_amplitude*math.sin(ellipse_angle*math.pi-pi_cyc)
+    x_theta = leg_x + leg_x_amplitude*math.sin(pi_cyc + 2*math.pi*ellipse_angle)
     if x_theta<40:
         x_theta = 40
     elif x_theta > 120:
         x_theta = 120
+        
     RL_x_angle =  x_theta
     LL_x_angle = 180 - RL_x_angle
     

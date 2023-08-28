@@ -15,7 +15,14 @@ as5048_spi=pyb.SPI(1)
 as5048_spi.init(mode=pyb.SPI.MASTER,prescaler=8,bits=8)
 mag = as5048a.AS5048A(as5048_spi, as5048_cs)
 
-pca.duty(3,10)
+pca.duty(5,260)
+max_angle = 0
+min_angle = 1000
 while True:
-    print(mag.read_angle())
+    angle = mag.read_angle()
+    if angle > max_angle:
+        max_angle = angle
+    elif angle < min_angle:
+        min_angle = angle
+    print(max_angle, min_angle, angle)
     time.sleep(0.01)

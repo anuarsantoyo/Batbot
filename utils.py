@@ -140,7 +140,7 @@ def fitness_batbotV1(measurements, plot=False, smooth=False):
     if plot:
         measurements.plot(x='timestamp')
         plt.show()
-    return abs(measurements.drop('timestamp', axis=1).mean().sum())
+    return (measurements.drop('timestamp', axis=1).mean()**2).sum()
 
 def fitness_project(measurements):
     """
