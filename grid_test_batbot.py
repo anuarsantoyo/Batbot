@@ -10,18 +10,18 @@ import itertools
 
 
 # Connection details
-daq_port = "/dev/ttyUSB0"  # Find port using !python -m serial.tools.list_ports
-command_port = "/dev/ttyACM1"
+daq_port = "/dev/ttyUSB1"  # Find port using !python -m serial.tools.list_ports
+command_port = "/dev/ttyACM0"
 
 
-save_directory = "experiments/optimizer_batbotV2_2D/data/230828/test1/"
-results = pd.DataFrame(columns=['Generation', 'Id', 'Score', 'Motor', 'Attack']) #,'Neutral', 'Amplitude'])TODO:dim
+save_directory = "experiments/optimizer_batbotV2_2D/data/230830/grid_test1/"
+results = pd.DataFrame(columns=['Generation', 'Id', 'Score', 'Motor', 'Attack'])  # ,'Neutral', 'Amplitude']) TODO:dim
 generation_0 = 0
 
 # df to plot scores
 scores_plot = []
 df_dict_list = []
-n_generation = 10
+n_generation = 5
 
 # Loop for all generations
 for generation in range(generation_0, generation_0+n_generation):
@@ -33,15 +33,15 @@ for generation in range(generation_0, generation_0+n_generation):
 
     solutions = []
     for x_0, x_1 in itertools.product([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1], repeat=2):
-        x = (x_0, x_1)
+        x = (x_1, x_0)
         print(f"Test: {x}")
 
         command_batbotV2_2D(x, command_port)  #TODO:dim
 
-        time.sleep(2)  # To allow the Batbot to reach the attack angle and flapping speed
-        measurements = read_measurements_df(port=daq_port, duration=5)
+        time.sleep(1)  # To allow the Batbot to reach the attack angle and flapping speed
+        measurements = read_measurements_df_oldDAQ(port=daq_port, duration=5)
         score = fitness_project(measurements)
-        measurements.to_csv(save_directory + f"{generation}_{i}({score}).csv", index=False)
+        measurements.to_csv(save_directory + f"measurements/{x}_{generation}({score}).csv", index=False)
         solutions.append((x, score))
         motor, attack_angle = x  # , neutral_state, amplitude TODO:dim
         df_dict_list.append({'Generation': generation,
@@ -51,7 +51,6 @@ for generation in range(generation_0, generation_0+n_generation):
                              'Attack': attack_angle})  # ,'Neutral': neutral_state,'Amplitude': amplitude}) TODO:dim
         print(f"Result: {score} \n")
         time.sleep(1)
-
 
     df = pd.DataFrame(df_dict_list)
     results = pd.concat([results, df], ignore_index=True)

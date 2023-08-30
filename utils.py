@@ -10,6 +10,8 @@ from scipy.signal import savgol_filter
 
 sensors_col = [f'sensor_{i}' for i in range(1, 7)]
 calibration = pd.read_csv('/home/anuarsantoyo/PycharmProjects/Batbot/analysis/sensor_calibration.csv')
+
+
 def command_prototype(solution):
     """
     This function takes a proposed solution from the CMA optimization and commands the robot run it.
@@ -22,6 +24,7 @@ def command_prototype(solution):
     print(f"Sending command to batbot amp: {amplitude}, freq: {frequency}...")
     html = urllib.request.urlopen(f"http://192.168.43.246/${amplitude},{frequency}$")
     print("Sent!")
+
 
 def command_batbot2dof(solution, ip_address):
     """
@@ -84,6 +87,7 @@ def command_batbotV2_2D(solution, port):
     ser.write(str.encode(f'{motor},{attack_angle},{leg_x},{leg_y},{leg_x_amplitude},{leg_y_amplitude},{ellipse_angle}'))
     print("Sent!")
 
+
 def command_batbotV1_wifi(solution, ip_address):
     """
     This function takes a proposed solution from the CMA optimization and commands the robot run it.
@@ -111,6 +115,7 @@ def command_batbotV1_wifi(solution, ip_address):
         pass
     print("Sent!")
 
+
 def fitness_prototype(measurements, plot=False):
     """
     Calculates fitness score of solution from the measured data
@@ -131,6 +136,7 @@ def fitness_prototype(measurements, plot=False):
         plt.show()
     return np.square(error).mean()
 
+
 def fitness_batbotV1(measurements, plot=False, smooth=False):
     """
     Calculates fitness score of solution from the measured data
@@ -147,6 +153,7 @@ def fitness_batbotV1(measurements, plot=False, smooth=False):
         plt.show()
     return (measurements.drop('timestamp', axis=1).mean()**2).sum()
 
+
 def fitness_project(measurements):
     """
     Calculates the fitness of a measurement slicing it from the back to learn the influence of the tail values and fits
@@ -162,6 +169,7 @@ def fitness_project(measurements):
     fit = np.poly1d(np.polyfit(x, scores_avg, 1))
     return fit(0)
 
+
 def fitness_batbot2dof(measurements, plot=False):
     """
     Calculates fitness score of solution from the measured data
@@ -173,7 +181,6 @@ def fitness_batbot2dof(measurements, plot=False):
         plt.show()
 
     return (measurements.drop('timestamp', axis=1)**2).mean().sum()
-
 
 
 def min_max_creator(min_value=210, max_value=970):  # Values experimentally calculated
@@ -286,6 +293,7 @@ def bytes_to_float(h1, h2, h3, h4):
     ba.append(h4)
     return struct.unpack("!f", ba)[0]
 
+
 def bytes_to_int(h1, h2, h3, h4):
     """
     Convert bytes to float
@@ -301,6 +309,7 @@ def bytes_to_int(h1, h2, h3, h4):
     ba.append(h3)
     ba.append(h4)
     return struct.unpack("!i", ba)[0]
+
 
 def measurements_to_df(measurement_bytes):
     """
@@ -319,6 +328,7 @@ def measurements_to_df(measurement_bytes):
             row[f'sensor_{i + 1}'] = bytes_to_float(measure[pos], measure[pos + 1], measure[pos + 2], measure[pos + 3])
         dict_list.append(row)  # Append row dict to list
     return pd.DataFrame(dict_list)  # Convert from list to dataframe
+
 
 def read_measurements_df_oldDAQ(port='/dev/ttyUSB0', duration=10, calibration=False):
     """
@@ -342,8 +352,10 @@ def read_measurements_df_oldDAQ(port='/dev/ttyUSB0', duration=10, calibration=Fa
     print('Read!')
     return df - shift
 
+
 def get_sensor_calibration():
     return pd.read_csv('analysis/sensor_calibration_oldDAQ.csv')
+
 
 def get_one_data(port_obj):
     port_obj.reset_input_buffer()
@@ -375,13 +387,14 @@ def read_measurements_df1(port, duration=10, sample_interval_ns=20_000_000):
         ret_df.loc[i-1] = line
     return ret_df
 
+
 def read_measurements_df(port, duration=10):
     uart = serial.Serial(port, 115200, timeout=1)
     t_0 = time.time()
     data = []
     while time.time() - t_0 < duration:
         data.append((time.time(), get_one_data(uart)))
-        time.sleep(0.001)
+        time.sleep(0.01)  # 0.001
 
     df_list = [{'timestamp': time-data[0][0],
                 'sensor_1':sensors[0] - calibration.loc['sensor_1'][0],
