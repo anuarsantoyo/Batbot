@@ -48,14 +48,14 @@ while True:
         servos.position(ATTACK, attack_angle)
         
         start_time = utime.ticks_ms()
-        duration = 7500  # 7.5 seconds
+        duration = 6500  # 7.5 seconds
 
         old_angle = mag.read_angle()  # Used to calculate derivative which gives stroke direction
         while utime.ticks_diff(utime.ticks_ms(), start_time) < duration:  # Run as long as stated experiment duration
             utime.sleep(0.001)  #  Used to stabiize the loop, if not added time measurement fails.
             new_angle = mag.read_angle()
             upward = new_angle < old_angle  # Calculate wing beat direction
-            cyc = 1 - (new_angle - 194) / (235 - 194)  # down:0 up:1
+            cyc = 1-(new_angle-14)/(56-14)  # down:0 up:1
 
             if upward:
                 pi_cyc = math.pi * cyc  # [0,pi]

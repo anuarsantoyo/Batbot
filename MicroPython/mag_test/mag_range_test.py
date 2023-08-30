@@ -25,7 +25,7 @@ ATTACK = 6
 folded = 160
 extended = 50
 
-pca.duty(FLAPPER,200)
+pca.duty(FLAPPER,260)
 servos.position(ATTACK,120)
 servos.position(FOLDER, folded)
 time.sleep(3)

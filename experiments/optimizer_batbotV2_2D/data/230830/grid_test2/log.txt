@@ -1,0 +1,9 @@
+In this test we used the V2 of the Batbot. The legs were static and parallel to the body, the wings also were folding
+and unfolding.
+For the moment only the motor speed and attack angle were optimized.
+motor = np.interp(motor, [0, 1], [260, 270])
+attack_angle = np.interp(attack_angle, [0, 1], [80, 130])
+
+Because of the noise generated, I decided to stop at only one generation. The results were so smooth and from the
+experience of the last results I can confidently use this results for analysis without the need of repeating the
+experiment several times (at least for now). In results_compared we can see

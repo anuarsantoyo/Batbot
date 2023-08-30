@@ -9,4 +9,5 @@ This is the repetition of the tests done on 230825 to see what happened with the
 Some issues with the wings were solved and also all the wires were finally organized. This can be considered the first
 real experiment compared to the other tests used to find error or test stuff.
 
-The wing broke at generation 14.
+The wing broke at generation 14 and was repaired. The results show that using Richard DAQ is to noisy, and the score
+variance in solutions that are close to each other is too high.

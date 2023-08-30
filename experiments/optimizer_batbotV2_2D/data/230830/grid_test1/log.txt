@@ -1,0 +1,9 @@
+In this test we used the V2 of the Batbot. The legs were static and parallel to the body, the wings also were always
+extended.
+For the moment only the motor speed and attack angle were optimized.
+motor = np.interp(motor, [0, 1], [260, 270])
+attack_angle = np.interp(attack_angle, [0, 1], [80, 130])
+
+I did 3 generations of grid test and also added in results_combined.html the results of 230829. So in total we had 4
+grid search generations. The scores showed to be stable, as all the scores for a solutions had a small variance, the
+score function was clearly and smoothly seen in each generation.

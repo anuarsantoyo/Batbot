@@ -1,0 +1,9 @@
+In this test we used the V2 of the Batbot. The legs were static and parallel to the body, the wings also were always
+extended.
+For the moment only the motor speed and attack angle were optimized.
+motor = np.interp(motor, [0, 1], [260, 270])
+attack_angle = np.interp(attack_angle, [0, 1], [80, 130])
+
+This test used the old DAQ and show BEAUTIFUL results, the results were so good that I had to double check. Even though
+we only used 1 iteration we can see that the score function very clearly reveals itself and shows to be quite smooth
+(as expected).

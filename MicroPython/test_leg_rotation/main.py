@@ -33,7 +33,7 @@ leg_x = 40  # 50-140
 leg_x_amplitude = 0
 ellipse_angle = 0.5
 attack_angle = 120
-motor = 250
+motor = 260
 
 
 # 50-160 extended-folded
@@ -49,7 +49,7 @@ while True:
     time.sleep(0.001)
     new_angle = mag.read_angle()
     upward = new_angle < old_angle
-    cyc = 1-(new_angle-194)/(235-194)  # down:0 up:1
+    cyc = 1-(new_angle-14)/(56-14)  # down:0 up:1
     
     if upward:
         pi_cyc = math.pi*cyc
