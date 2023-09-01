@@ -4,6 +4,9 @@ For the moment only the motor speed and attack angle were optimized.
 motor = np.interp(motor, [0, 1], [260, 270])
 attack_angle = np.interp(attack_angle, [0, 1], [80, 130])
 
-Because of the noise generated, I decided to stop at only one generation. The results were so smooth and from the
-experience of the last results I can confidently use this results for analysis without the need of repeating the
-experiment several times (at least for now). In results_compared we can see
+Because of the acoustic noise generated, I decided to stop at only one generation. The results were so smooth and from
+the experience of the last results I can confidently use this results for analysis without the need of repeating the
+experiment several times (at least for now).
+In experiments/optimizer_batbotV2_2D/data/230830/grid_test2/results_compared.html we can see the score comparison of one
+experiment using folding and other extending, it can be seen that when using folding in almost each grid point the score
+is clearly smaller.

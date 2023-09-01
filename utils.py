@@ -330,7 +330,7 @@ def measurements_to_df(measurement_bytes):
     return pd.DataFrame(dict_list)  # Convert from list to dataframe
 
 
-def read_measurements_df_oldDAQ(port='/dev/ttyUSB0', duration=10, calibration=False):
+def read_measurements_df_BSQJNP8(port='/dev/ttyUSB0', duration=10, calibration=False):
     """
     Obtain measurements of the DAQ for a given duration and process them into a dataframe.
     :param port: path to the port the DAQ is connected to, which can be found with python -m serial.tools.list_ports
@@ -340,10 +340,8 @@ def read_measurements_df_oldDAQ(port='/dev/ttyUSB0', duration=10, calibration=Fa
     """
     print('Reading measurements...')
     if calibration:
-        b = get_sensor_calibration()
-        shift = pd.Series(data=b['data'].to_list(), index=b['index'].to_list())
-        # can't be calibrated to zero.
-        #shift = measurements_to_df(read_measurements_raw(port=port, duration=1)).drop('timestamp', axis=1).mean()
+        calibration_data = get_sensor_calibration()
+        shift = pd.Series(data=calibration_data['data'].to_list(), index=calibration_data['index'].to_list())
         shift['timestamp'] = 0.0
     else:
         shift = 0
@@ -354,8 +352,10 @@ def read_measurements_df_oldDAQ(port='/dev/ttyUSB0', duration=10, calibration=Fa
 
 
 def get_sensor_calibration():
-    return pd.read_csv('analysis/sensor_calibration_oldDAQ.csv')
+    return pd.read_csv('/home/anuarsantoyo/PycharmProjects/Batbot/analysis/sensor_calibration_BSQJNP8.csv')
 
+def get_sensor_calibration_BSQJNP8():
+    return pd.read_csv('analysis/sensor_calibration_BSQJNP8.csv')
 
 def get_one_data(port_obj):
     port_obj.reset_input_buffer()
