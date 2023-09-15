@@ -29,6 +29,8 @@ ATTACK = 6
 folded = 160
 extended = 50
 
+angle_max = 164
+angle_min = 131
 # Motors initialization
 pca.duty(FLAPPER, 200)
 servos.position(ATTACK, 120)
@@ -55,7 +57,7 @@ while True:
             utime.sleep(0.001)  #  Used to stabiize the loop, if not added time measurement fails.
             new_angle = mag.read_angle()
             upward = new_angle < old_angle  # Calculate wing beat direction
-            cyc = 1-(new_angle-14)/(56-14)  # down:0 up:1
+            cyc = (new_angle-angle_min)/(angle_max-angle_min)  # down:0 up:1
 
             if upward:
                 pi_cyc = math.pi * cyc  # [0,pi]
@@ -71,8 +73,8 @@ while True:
             else:
                 fold = extended  # down-stroke extend
 
-            #servos.position(FOLDER, extended) # uncomment if you want to disable folding
-            servos.position(FOLDER, fold)
+            servos.position(FOLDER, extended) # uncomment if you want to disable folding
+            #servos.position(FOLDER, fold)
             old_angle = new_angle
 
             y_theta = leg_y - leg_y_amplitude * math.cos(pi_cyc)  # Calculate angle from body plane to leg in vertical

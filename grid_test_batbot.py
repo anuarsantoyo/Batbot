@@ -11,9 +11,9 @@ import itertools
 
 # Connection details
 daq_port = "/dev/ttyUSB0"  # Find port using !python -m serial.tools.list_ports
-command_port = "/dev/ttyACM1"
+command_port = "/dev/ttyACM0"
 
-save_directory = "experiments/optimizer_batbotV2_2D/data/230830/grid_test2/"
+save_directory = "experiments/optimizer_batbotV2_2D/data/230914/grid_test1/"
 results = pd.DataFrame(columns=['Generation', 'Id', 'Score', 'Motor', 'Attack'])  # ,'Neutral', 'Amplitude']) TODO:dim
 generation_0 = 0
 
@@ -40,7 +40,7 @@ for generation in range(generation_0, generation_0+n_generation):
             command_batbotV2_2D(x, command_port)  #TODO:dim
 
             time.sleep(1)  # To allow the Batbot to reach the attack angle and flapping speed
-            measurements = read_measurements_df_oldDAQ(port=daq_port, duration=5)
+            measurements = read_measurements_df_BSQJNP8(port=daq_port, duration=5)
             score = fitness_project(measurements)
             measurements.to_csv(save_directory + f"measurements/{x}_{generation}({score}).csv", index=False)
             solutions.append((x, score))

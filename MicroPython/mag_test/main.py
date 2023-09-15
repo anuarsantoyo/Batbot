@@ -5,6 +5,16 @@ import pca9685_servo
 import as5048a
 import time
 import math
+RL_x = 0
+RL_y = 1
+LL_x = 2
+LL_y = 3
+FOLDER = 4
+FLAPPER = 5
+ATTACK = 6
+folded = 160
+extended = 50
+
 i2c = machine.SoftI2C("X9","X10",freq=100000)
 pca = pca9685.PCA9685(i2c)
 servos = pca9685_servo.Servos(pca)
@@ -15,7 +25,7 @@ as5048_spi=pyb.SPI(1)
 as5048_spi.init(mode=pyb.SPI.MASTER,prescaler=8,bits=8)
 mag = as5048a.AS5048A(as5048_spi, as5048_cs)
 
-pca.duty(5,270)
+pca.duty(FLAPPER,260)
 max_angle = 0
 min_angle = 1000
 while True:

@@ -9,7 +9,7 @@ import pandas as pd
 from scipy.signal import savgol_filter
 
 sensors_col = [f'sensor_{i}' for i in range(1, 7)]
-calibration = pd.read_csv('/home/anuarsantoyo/PycharmProjects/Batbot/analysis/sensor_calibration.csv')
+calibration = pd.read_csv('/analysis/sensor_calibration_sanitiycheck.csv')
 
 
 def command_prototype(solution):
@@ -75,7 +75,7 @@ def command_batbotV2_2D(solution, port):
     """
     motor, attack_angle = solution
     motor = np.interp(motor, [0, 1], [260, 270])
-    attack_angle = np.interp(attack_angle, [0, 1], [80, 130])
+    attack_angle = np.interp(attack_angle, [0, 1], [80, 120])
     leg_x = 50
     leg_y = 90
     leg_x_amplitude = 0
@@ -154,7 +154,7 @@ def fitness_batbotV1(measurements, plot=False, smooth=False):
     return (measurements.drop('timestamp', axis=1).mean()**2).sum()
 
 
-def fitness_project(measurements):
+def fitness_project(measurements, plot=False):
     """
     Calculates the fitness of a measurement slicing it from the back to learn the influence of the tail values and fits
      a linear function to project the real fitness were the tail values are no influence
@@ -164,9 +164,15 @@ def fitness_project(measurements):
     scores_avg = []
     for i in range(1, 200):  # for a 5 seconds test we obtain 320 data, doing the analysis with the las 200 showed to
         # the most stable
-        scores_avg.append(fitness_batbotV1(measurements[:-i], smooth=True))
+        scores_avg.append(fitness_batbotV1(measurements[:-i], smooth=False))
     x = np.arange(len(scores_avg))
     fit = np.poly1d(np.polyfit(x, scores_avg, 1))
+    if plot:
+        plt.plot(x, scores_avg)
+        plt.plot(x, fit(x))
+        plt.show()
+        measurements.plot(x='timestamp')
+        plt.show()
     return fit(0)
 
 
@@ -353,9 +359,6 @@ def read_measurements_df_BSQJNP8(port='/dev/ttyUSB0', duration=10, calibration=F
 
 def get_sensor_calibration():
     return pd.read_csv('/home/anuarsantoyo/PycharmProjects/Batbot/analysis/sensor_calibration_BSQJNP8.csv')
-
-def get_sensor_calibration_BSQJNP8():
-    return pd.read_csv('analysis/sensor_calibration_BSQJNP8.csv')
 
 def get_one_data(port_obj):
     port_obj.reset_input_buffer()
