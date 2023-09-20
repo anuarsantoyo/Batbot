@@ -6,6 +6,7 @@ import as5048a
 import utime
 from micropython import const
 import math
+import time
 
 # Configuration
 i2c = machine.SoftI2C("X9","X10",freq=100000)  # For PCA
@@ -29,8 +30,45 @@ ATTACK = 6
 folded = 160
 extended = 50
 
-angle_max = 164
-angle_min = 131
+# Calculate max and min angles (for some weir reason they consantly change)
+#pca.duty(FLAPPER,200)
+#time.sleep(3)
+#pca.duty(FLAPPER,260)
+#maxes = []
+#mines = []
+#angle_0 = 0
+#angle_1 = 0
+#angle_2 = 0
+
+#for i in range(500):
+#    angle_0 = angle_1
+#    angle_1 = angle_2
+#    angle_2 = mag.read_angle()
+#    if (angle_1>angle_0) and (angle_1>angle_2):
+#        maxes.append(angle_1)
+#    elif (angle_1<angle_0) and (angle_1<angle_2):
+#        mines.append(angle_1)
+#    time.sleep(0.01)
+
+#def median(lst):
+#    sorted_lst = sorted(lst)
+#    lst_len = len(sorted_lst)
+    
+    # If the list has an odd number of items, return the middle one
+#    if lst_len % 2 == 1:
+#        return sorted_lst[lst_len // 2]
+    # If the list has an even number of items, return the average of the two middle ones
+#    else:
+#        left_mid = sorted_lst[(lst_len - 1) // 2]
+#        right_mid = sorted_lst[lst_len // 2]
+#        return (left_mid + right_mid) / 2
+
+#angle_max = median(maxes)
+#angle_min = median(mines)
+
+angle_max = 158.232
+angle_min = 124.806
+
 # Motors initialization
 pca.duty(FLAPPER, 200)
 servos.position(ATTACK, 120)
@@ -56,9 +94,9 @@ while True:
         while utime.ticks_diff(utime.ticks_ms(), start_time) < duration:  # Run as long as stated experiment duration
             utime.sleep(0.001)  #  Used to stabiize the loop, if not added time measurement fails.
             new_angle = mag.read_angle()
-            upward = new_angle < old_angle  # Calculate wing beat direction
+            upward = new_angle > old_angle  # Calculate wing beat direction
             cyc = (new_angle-angle_min)/(angle_max-angle_min)  # down:0 up:1
-
+            print(new_angle, cyc)
             if upward:
                 pi_cyc = math.pi * cyc  # [0,pi]
             else:
@@ -73,8 +111,8 @@ while True:
             else:
                 fold = extended  # down-stroke extend
 
-            servos.position(FOLDER, extended) # uncomment if you want to disable folding
-            #servos.position(FOLDER, fold)
+            #servos.position(FOLDER, extended) # uncomment if you want to disable folding
+            servos.position(FOLDER, fold)
             old_angle = new_angle
 
             y_theta = leg_y - leg_y_amplitude * math.cos(pi_cyc)  # Calculate angle from body plane to leg in vertical

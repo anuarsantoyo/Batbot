@@ -6,10 +6,10 @@ from matplotlib.patches import Ellipse
 import time
 import struct
 import pandas as pd
-from scipy.signal import savgol_filter
+from scipy.signal import savgol_filter, find_peaks
 
 sensors_col = [f'sensor_{i}' for i in range(1, 7)]
-calibration = pd.read_csv('/analysis/sensor_calibration_sanitiycheck.csv')
+#calibration = pd.read_csv('/analysis/sensor_calibration_BSQJNP8.csv')
 
 
 def command_prototype(solution):
@@ -88,6 +88,31 @@ def command_batbotV2_2D(solution, port):
     print("Sent!")
 
 
+def command_batbotV2_5D(solution, port):
+    """
+    This function takes a proposed solution from the CMA optimization and commands the robot run it.
+    :param solution: list of proposed solutions [motor, attack_angle, neutral_state, amplitude]
+    :param port: port of the wireless uart module.
+    :return: None
+    """
+    leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle = solution
+    motor = np.interp(0, [0, 1], [260, 280]) #.94
+    attack_angle = np.interp(.55, [0, 1], [80, 120])
+    leg_x = np.interp(leg_x, [0, 1], [50, 140])
+    leg_y = np.interp(leg_y, [0, 1], [0, 180])
+    leg_x_amplitude = np.interp(leg_x_amplitude, [0, 1], [0, 45])
+    leg_y_amplitude = np.interp(leg_y_amplitude, [0, 1], [0, 90])
+    print(f"Sending command to batbot "
+          f"leg_x: {leg_x}\n"
+          f"leg_y: {leg_y}\n"
+          f"leg_x_amplitude: {leg_x_amplitude}\n"
+          f"leg_y_amplitude: {leg_y_amplitude}\n"
+          f"Ellipse: {ellipse_angle}\n")
+    ser = serial.Serial(port=port, baudrate=115200, bytesize=8, parity='N', stopbits=1)
+    ser.write(str.encode(f'{motor},{attack_angle},{leg_x},{leg_y},{leg_x_amplitude},{leg_y_amplitude},{ellipse_angle}'))
+    print("Sent!")
+
+
 def command_batbotV1_wifi(solution, ip_address):
     """
     This function takes a proposed solution from the CMA optimization and commands the robot run it.
@@ -153,12 +178,26 @@ def fitness_batbotV1(measurements, plot=False, smooth=False):
         plt.show()
     return (measurements.drop('timestamp', axis=1).mean()**2).sum()
 
+def fitness_mse(measurements):
+    """
+    Calculates the fitness as the MSE, with the idea of trying to reduce to zero the sensors instead of just it's mean.
+    The sensor 1 which has shown to have the largest values is just to slice the df from the first peak to the last
+    valley.
+    :param measurements: df of data provided by read_measurements_df()
+    :return: score
+    """
+    y = measurements.sensor_1
+    peaks, _ = find_peaks(y, height=0)
+    valleys, _ = find_peaks(-y, height=0)
+    df_sliced = measurements.iloc[peaks[0]: valleys[-1]]
+    return (df_sliced.drop('timestamp', axis=1) ** 2).mean().sum()
+
 
 def fitness_project(measurements, plot=False):
     """
     Calculates the fitness of a measurement slicing it from the back to learn the influence of the tail values and fits
      a linear function to project the real fitness were the tail values are no influence
-    :param measurements: np.aray of data provided by read_measurements_df()
+    :param measurements: df of data provided by read_measurements_df()
     :return: score
     """
     scores_avg = []

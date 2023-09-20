@@ -25,6 +25,9 @@ ATTACK = 6
 folded = 160
 extended = 50
 
+angle_max = 165
+angle_min = 131
+
 
 # Parameters
 leg_y = 90
@@ -48,9 +51,9 @@ old_angle = mag.read_angle()  # Used to calculate derivative which gives stroke 
 while True:
     time.sleep(0.001)
     new_angle = mag.read_angle()
-    upward = new_angle < old_angle
-    cyc = 1-(new_angle-14)/(56-14)  # down:0 up:1
-    
+    upward = new_angle > old_angle  # Calculate wing beat direction
+    cyc = (new_angle-angle_min)/(angle_max-angle_min)  # down:0 up:1
+            
     if upward:
         pi_cyc = math.pi*cyc
     else:
