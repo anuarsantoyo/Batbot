@@ -3,12 +3,15 @@ import serial
 import numpy as np
 import urllib.request
 from matplotlib.patches import Ellipse
-import time
 import struct
-import pandas as pd
 from scipy.signal import savgol_filter, find_peaks
-
-sensors_col = [f'sensor_{i}' for i in range(1, 7)]
+import minimalmodbus
+import time
+import pandas as pd
+sensors_col = ['Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz']
+calib = pd.read_csv('/home/anuarsantoyo/PycharmProjects/Batbot/analysis/forces/data/df_calib3.csv').mean()
+calib['Time'] = 0
+#sensors_col = [f'sensor_{i}' for i in range(1, 7)]
 #calibration = pd.read_csv('/analysis/sensor_calibration_BSQJNP8.csv')
 
 
@@ -74,7 +77,7 @@ def command_batbotV2_2D(solution, port):
     :return: None
     """
     motor, attack_angle = solution
-    motor = np.interp(motor, [0, 1], [260, 270])
+    motor = np.interp(motor, [0, 1], [260, 275])
     attack_angle = np.interp(attack_angle, [0, 1], [80, 120])
     leg_x = 50
     leg_y = 90
@@ -96,8 +99,8 @@ def command_batbotV2_5D(solution, port):
     :return: None
     """
     leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle = solution
-    motor = np.interp(0, [0, 1], [260, 280]) #.94
-    attack_angle = np.interp(.55, [0, 1], [80, 120])
+    motor = np.interp(0.90, [0, 1], [260, 275])
+    attack_angle = np.interp(.30, [0, 1], [80, 120])
     leg_x = np.interp(leg_x, [0, 1], [50, 140])
     leg_y = np.interp(leg_y, [0, 1], [0, 180])
     leg_x_amplitude = np.interp(leg_x_amplitude, [0, 1], [0, 45])
@@ -107,10 +110,34 @@ def command_batbotV2_5D(solution, port):
           f"leg_y: {leg_y}\n"
           f"leg_x_amplitude: {leg_x_amplitude}\n"
           f"leg_y_amplitude: {leg_y_amplitude}\n"
-          f"Ellipse: {ellipse_angle}\n")
+          f"Ellipse: {ellipse_angle}")
     ser = serial.Serial(port=port, baudrate=115200, bytesize=8, parity='N', stopbits=1)
     ser.write(str.encode(f'{motor},{attack_angle},{leg_x},{leg_y},{leg_x_amplitude},{leg_y_amplitude},{ellipse_angle}'))
-    print("Sent!")
+    print("Sent!\n")
+
+def command_batbotV2_allD(solution, port):
+    """
+    This function takes a proposed solution from the CMA optimization and commands the robot run it.
+    :param solution: list of proposed solutions [motor, attack_angle, neutral_state, amplitude]
+    :param port: port of the wireless uart module.
+    :return: None
+    """
+    motor, attack_angle, leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle = solution
+    motor = np.interp(motor, [0, 1], [260, 300])
+    attack_angle = np.interp(attack_angle, [0, 1], [80, 120])
+    leg_x = np.interp(leg_x, [0, 1], [50, 140])
+    leg_y = np.interp(leg_y, [0, 1], [0, 180])
+    leg_x_amplitude = np.interp(leg_x_amplitude, [0, 1], [0, 45])
+    leg_y_amplitude = np.interp(leg_y_amplitude, [0, 1], [0, 90])
+    print(f"Sending command to batbot "
+          f"leg_x: {leg_x}\n"
+          f"leg_y: {leg_y}\n"
+          f"leg_x_amplitude: {leg_x_amplitude}\n"
+          f"leg_y_amplitude: {leg_y_amplitude}\n"
+          f"Ellipse: {ellipse_angle}")
+    ser = serial.Serial(port=port, baudrate=115200, bytesize=8, parity='N', stopbits=1)
+    ser.write(str.encode(f'{motor},{attack_angle},{leg_x},{leg_y},{leg_x_amplitude},{leg_y_amplitude},{ellipse_angle}'))
+    print("Sent!\n")
 
 
 def command_batbotV1_wifi(solution, ip_address):
@@ -191,6 +218,21 @@ def fitness_mse(measurements):
     valleys, _ = find_peaks(-y, height=0)
     df_sliced = measurements.iloc[peaks[0]: valleys[-1]]
     return (df_sliced.drop('timestamp', axis=1) ** 2).mean().sum()
+
+def fitness_mean(measurements):
+    """
+    Calculates the fitness as the MSE, with the idea of trying to reduce to zero the sensors instead of just it's mean.
+    The sensor 1 which has shown to have the largest values is just to slice the df from the first peak to the last
+    valley.
+    :param measurements: df of data provided by read_measurements_df()
+    :return: score
+    """
+    y = measurements.sensor_1
+    peaks, _ = find_peaks(y, height=0)
+    valleys, _ = find_peaks(-y, height=0)
+    df_sliced = measurements.iloc[peaks[0]: valleys[-1]]
+    return (df_sliced.drop('timestamp', axis=1).mean()**2).sum()
+
 
 
 def fitness_project(measurements, plot=False):
@@ -321,6 +363,30 @@ def read_measurements_raw(port='/dev/ttyUSB0', duration=10):
     ser.close()
     return measurements[1:]  # Omit first as it usually is a zero.
 
+def read_measurements_6axis_raw(port='/dev/ttyUSB0', duration=10):
+    """
+    Send command to BSQ-JN-P8 (DAQ) to return float measurements of all the sensors connected to it, and give back a list
+    with the raw byte message with a timestamp of the measurement.
+
+    :param port: path to the port the DAQ is connected to, which can be found with python -m serial.tools.list_ports
+    :param duration: Duration of the measurements in seconds
+    :return: A list of tuples in the form of [(timestamp 1, measurement 1), ...]
+    """
+    # Initialize serial connection. Parameters found from DAQ documentation.
+    ser = serial.Serial(port=port, baudrate=115200, bytesize=8, parity='N', stopbits=1)
+    measurements = []
+    start = time.time()
+    while time.time() - start < duration:  # Get measurements as long as the elapse time is smaller than the duration
+        ser.write(b'\x01\x03\x00\xc8\x00\x10\xc5\xf8')  # Send command to DAQ to get floats of all channels (float)
+        #ser.write(b'\x01\x03\x01\xf4\x00\x10\x04\x08')  # Send command to DAQ to get int of all channels (long int)
+
+        # (from DAQ doc)
+        measurements.append((time.time(), ser.read(37)))  # Create list of measurements.
+        # I specified 37 as those are the bytes expected as my response, this allows me to have a higher sample
+        # frequency as always only 37 bytes are read instead of readings getting mixed.
+    ser.close()
+    return measurements[1:]  # Omit first as it usually is a zero.
+
 
 def bytes_to_float(h1, h2, h3, h4):
     """
@@ -374,6 +440,58 @@ def measurements_to_df(measurement_bytes):
         dict_list.append(row)  # Append row dict to list
     return pd.DataFrame(dict_list)  # Convert from list to dataframe
 
+def twos_complement(value, bits):
+    """Compute the 2's complement of int value."""
+    if value & (1 << (bits - 1)):
+        value -= 1 << bits
+    return value
+
+def read_measurements_df_6axis(port='/dev/ttyUSB0', duration=10, calibration=False):
+    '''
+
+    :param port:
+    :param duration:
+    :param calibration:
+    :return:
+    '''
+    # Setting up the Modbus RTU connection
+    instrument = minimalmodbus.Instrument(port, 1)
+    instrument.serial.baudrate = 115200
+    instrument.serial.parity = minimalmodbus.serial.PARITY_NONE
+    instrument.mode = minimalmodbus.MODE_RTU
+
+    # Store measurements for each of the 6 sensors
+    measurements = [[] for _ in range(6)]
+    time_points = []
+
+    end_time = time.time() + duration  # Measure for 5 seconds
+
+    while time.time() < end_time:
+        # Reading 12 registers starting from 2560 (0x0A00 in hex), which equals 24 bytes
+        response = instrument.read_registers(2560, 12, functioncode=3)
+
+        # Extracting the 6 quantities from the response and convert using two's complement
+        quantities = [twos_complement((response[i] << 16) | response[i + 1], 32) for i in range(0, len(response), 2)]
+
+        # Append measurements for each sensor
+        for q_values, q in zip(measurements, quantities):
+            q_values.append(q)
+
+        time_points.append(time.time() - (end_time - duration))  # Record the measurement time
+
+        time.sleep(0.01)  # Interval of 0.1 seconds
+
+    # Convert data to a DataFrame for easy plotting with Plotly Express
+    labels = ['Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz']
+    df = pd.DataFrame({'Time': time_points})
+    for label, data in zip(labels, measurements):
+        df[label] = data
+    df['Mx'] = -df['Mx']
+    df['Mz'] = -df['Mz']
+    if calibration:
+        return df-calib
+    else:
+        return df
 
 def read_measurements_df_BSQJNP8(port='/dev/ttyUSB0', duration=10, calibration=False):
     """
@@ -446,4 +564,12 @@ def read_measurements_df(port, duration=10):
                 'sensor_5':sensors[4] - calibration.loc['sensor_5'][0],
                 'sensor_6':sensors[5] - calibration.loc['sensor_6'][0]} for time, sensors in data]
     return pd.DataFrame(df_list)
+
+
+def arctan2_degrees(y, x):
+    angle = np.arctan2(y, x)
+    angle_deg = np.degrees(angle)
+    if angle_deg < 0:
+        angle_deg += 360
+    return angle_deg
 

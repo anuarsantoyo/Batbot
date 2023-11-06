@@ -26,7 +26,6 @@ LL_x = 2
 LL_y = 3
 FOLDER = 4
 FLAPPER = 5
-ATTACK = 6
 folded = 160
 extended = 50
 
@@ -66,12 +65,12 @@ extended = 50
 #angle_max = median(maxes)
 #angle_min = median(mines)
 
-angle_max = 158.232
-angle_min = 124.806
+angle_max = 331
+angle_min = 299
 
 # Motors initialization
-pca.duty(FLAPPER, 200)
-servos.position(ATTACK, 120)
+pca.duty(FLAPPER, 260)
+#servos.position(ATTACK, 120)
 servos.position(FOLDER, extended)
 utime.sleep(3)
 
@@ -85,7 +84,7 @@ while True:
             = [float(num) for num in numbers]  # Extract command
 
         pca.duty(FLAPPER, motor)
-        servos.position(ATTACK, attack_angle)
+        #servos.position(ATTACK, attack_angle)
         
         start_time = utime.ticks_ms()
         duration = 6500  # 7.5 seconds
@@ -140,7 +139,7 @@ while True:
             servos.position(RL_x, RL_x_angle)
             servos.position(LL_x, LL_x_angle)
 
-            servos.position(ATTACK, attack_angle)
+            #servos.position(ATTACK, attack_angle)
             pca.duty(FLAPPER, motor)
 
         uart.read()  # in case data was sent while in the loop it is deleted

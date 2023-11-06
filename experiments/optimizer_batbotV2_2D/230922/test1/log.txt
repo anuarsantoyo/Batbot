@@ -1,0 +1,6 @@
+The idea on this experiment is to do the whole process of optimization.
+We will train first only the 2D to find the correct flapping and angle and then used that info to keep optimizing using
+the other 5D.
+Important changes on this experiment.
+Fitness_mean() will be used in the whole process to ensure a valid comparison a battery has been added to take its
+weight into account and once the angle is found it will be physically fixed.
