@@ -1,0 +1,13 @@
+In this test we used the V2 of the Batbot. The legs were static and parallel to the body, the wings also were always
+extended, this was because at first I had problems to install the magnetic encoder, but after seeing such good results
+I think it is also good to show the improvement when gradually adding optimizations (folding, leg-flapping).
+For the moment only the motor speed and attack angle were optimized.
+motor = np.interp(motor, [0, 1], [260, 270])
+attack_angle = np.interp(attack_angle, [0, 1], [80, 130])
+
+This is the repetition of the tests done on 230825 to see what happened with the sudden jump of the error.
+Some issues with the wings were solved and also all the wires were finally organized. This can be considered the first
+real experiment compared to the other tests used to find error or test stuff.
+
+The wing broke at generation 14 and was repaired. The results show that using Richard DAQ is to noisy, and the score
+variance in solutions that are close to each other is too high.

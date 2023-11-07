@@ -89,14 +89,14 @@ while True:
     time.sleep(0.001)
     
     # Used to slowly increase motor
-    if utime.ticks_diff(utime.ticks_ms(), start_time) > 3000:
+    '''if utime.ticks_diff(utime.ticks_ms(), start_time) > 3000:
         time.sleep(0.001)
         start_time = utime.ticks_ms()
         motor += 1
         print(motor)
         if motor>285:
             motor=200
-        pca.duty(FLAPPER, motor)
+        pca.duty(FLAPPER, motor)'''
 
         
     
@@ -128,7 +128,7 @@ while True:
         
     servos.position(FOLDER, fold)
     old_angle = new_angle
-    print(pi_cyc)#, new_angle)
+    print(cyc)#, new_angle)
     
     y_theta = leg_y - leg_y_amplitude*math.cos(pi_cyc)        
     if y_theta < 30:

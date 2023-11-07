@@ -10,13 +10,13 @@ from pandas.plotting import parallel_coordinates
 
 # Connection details
 daq_port = "/dev/ttyUSB0"  # Find port using !python -m serial.tools.list_ports
-command_port = "/dev/ttyACM0"
+command_port = "/dev/ttyACM1"
 
 
 # Start the CMA optimizer
 pop_size = 10
 n_generation = 20
-save_directory = "experiments/optimizer_batbotV2_2D/230922/test1/"
+save_directory = "experiments/optimizer_batbotV2_5D/231107/test1/"  # TODO: dir
 load = False
 if load:
     file = open(save_directory+'optimizers/optimizer_49.pickle', 'rb')
@@ -26,14 +26,19 @@ if load:
     file.close()
     results = pd.read_csv(save_directory+'results.csv')
 else:
-    optimizer = CMA(mean=np.array([0.5, 0.5]),  # , 0.5, 0.5, 0.5]),  #
-                    #  TODO:dim
+    optimizer = CMA(mean=np.array([0.5 for i in range(6)]),  # TODO: dim
                     sigma=0.5,
                     population_size=pop_size,
-                    bounds=np.array([[0, 1], [0, 1]]))  # , [0, 1], [0, 1], [0, 1]]))  #   # TODO:dim
-    results = pd.DataFrame(columns=['Generation', 'Id', 'Score', 'Motor', 'Attack'])
-    # , 'Leg x', 'Leg y', 'Amplitude x', 'Amplitude y','Ellipse'])
-    #   TODO:dim
+                    bounds=np.array([[0, 1] for i in range(6)]))  # TODO: dim
+    results = pd.DataFrame(columns=['Generation',
+                                    'Id',
+                                    'Score',
+                                    'Motor',
+                                    'Leg x',
+                                    'Leg y',
+                                    'Amplitude x',
+                                    'Amplitude y',
+                                    'Ellipse'])  # TODO: dim
     generation_0 = 0
 
 # df to plot scores
@@ -53,39 +58,28 @@ for generation in range(generation_0, generation_0+n_generation):
     for i in range(optimizer.population_size):
         print(f"Test: {i+1}/{pop_size}")
         x = optimizer.ask()
-        score = 1
-        while score >= 1:  # Repeat until valid score
-            command_batbotV2_2D(x, command_port)  # TODO:dim
-            time.sleep(1)  # To allow the Batbot to reach the attack angle and flapping speed
-            measurements = read_measurements_df_BSQJNP8(port=daq_port, duration=5, calibration=True)
-            score = fitness_mean(measurements)
-            print(f"Result: {score}")
-            print("-" * 10)
-            print("\n")
-            time.sleep(1)
+        command_batbotV2_5D(x, command_port)  # TODO: dim
+        time.sleep(1)  # To allow the Batbot to reach the attack angle and flapping speed
+        measurements = read_measurements_df_6axis(port=daq_port, duration=5, calibration=True)
+        score = fitness_avg_force(measurements, plot=True)
+        print(f"Result: {score}")
+        print("-" * 10)
+        print("\n")
+        time.sleep(1)
 
         measurements.to_csv(save_directory + f"measurements/{generation}_{i}({score}).csv", index=False)
         solutions.append((x, score))
 
-        '''
-        leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle = x  # TODO:dim
-        df_dict_list.append({'Generation': generation,
-                             'Id': i,
-                             'Score': score,
-                             'Leg x': leg_x,
-                             'Leg y': leg_y,
-                             'Amplitude x': leg_x_amplitude,
-                             'Amplitude y': leg_y_amplitude,
-                             'Ellipse': ellipse_angle})'''
-
-        motor, attack_angle = x
+        motor, leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle = x  # TODO:dim
         df_dict_list.append({'Generation': generation,
                              'Id': i,
                              'Score': score,
                              'Motor': motor,
-                             'Attack': attack_angle})
-
-
+                             'Leg x': leg_x,
+                             'Leg y': leg_y,
+                             'Amplitude x': leg_x_amplitude,
+                             'Amplitude y': leg_y_amplitude,
+                             'Ellipse': ellipse_angle})
 
     optimizer.tell(solutions)
     df = pd.DataFrame(df_dict_list)
@@ -94,7 +88,7 @@ for generation in range(generation_0, generation_0+n_generation):
     with open(save_directory+f"optimizers/optimizer_{generation}.pickle", "wb") as file:
         pickle.dump({'optimizer': optimizer, 'last_generation': generation}, file)
 
-    # Visualization TODO:dim
+    # Visualization TODO: dim
     variables = results.drop(['Generation', 'Id', 'Score'], axis=1).columns
 
     fig, (ax1, ax2) = plt.subplots(1, 2, gridspec_kw={'width_ratios': [1, 0.1]}, figsize=(10, 6))
@@ -109,13 +103,8 @@ for generation in range(generation_0, generation_0+n_generation):
     plt.tight_layout()
     plt.show()
 
-
-    results_plot = results.copy()
-    results_plot['Generation'] = results_plot['Generation'].astype(str)
-    fig = px.scatter_3d(results_plot, x='Motor', y='Attack', z='Score', color='Generation', hover_data='Id')
-    fig.write_html(save_directory + "results.html")
-
     sns.lineplot(data=results, x="Generation", y="Score")
+    plt.savefig(save_directory + "score.jpg")
     plt.show()
 
     plt.figure(figsize=(12, 6))
@@ -127,5 +116,3 @@ for generation in range(generation_0, generation_0+n_generation):
     plt.tight_layout()  # Ensures that all elements of the plot fit well
     plt.savefig(save_directory + "results.jpg")
     plt.show()
-
-

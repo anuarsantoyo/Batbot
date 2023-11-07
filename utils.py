@@ -8,6 +8,8 @@ from scipy.signal import savgol_filter, find_peaks
 import minimalmodbus
 import time
 import pandas as pd
+from scipy.interpolate import interp1d
+
 sensors_col = ['Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz']
 calib = pd.read_csv('/home/anuarsantoyo/PycharmProjects/Batbot/analysis/forces/data/df_calib3.csv').mean()
 calib['Time'] = 0
@@ -98,9 +100,8 @@ def command_batbotV2_5D(solution, port):
     :param port: port of the wireless uart module.
     :return: None
     """
-    leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle = solution
-    motor = np.interp(0.90, [0, 1], [260, 275])
-    attack_angle = np.interp(.30, [0, 1], [80, 120])
+    motor, leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle = solution
+    motor = np.interp(motor, [0, 1], [260, 275])
     leg_x = np.interp(leg_x, [0, 1], [50, 140])
     leg_y = np.interp(leg_y, [0, 1], [0, 180])
     leg_x_amplitude = np.interp(leg_x_amplitude, [0, 1], [0, 45])
@@ -112,7 +113,7 @@ def command_batbotV2_5D(solution, port):
           f"leg_y_amplitude: {leg_y_amplitude}\n"
           f"Ellipse: {ellipse_angle}")
     ser = serial.Serial(port=port, baudrate=115200, bytesize=8, parity='N', stopbits=1)
-    ser.write(str.encode(f'{motor},{attack_angle},{leg_x},{leg_y},{leg_x_amplitude},{leg_y_amplitude},{ellipse_angle}'))
+    ser.write(str.encode(f'{motor},{leg_x},{leg_y},{leg_x_amplitude},{leg_y_amplitude},{ellipse_angle}'))
     print("Sent!\n")
 
 def command_batbotV2_allD(solution, port):
@@ -232,6 +233,79 @@ def fitness_mean(measurements):
     valleys, _ = find_peaks(-y, height=0)
     df_sliced = measurements.iloc[peaks[0]: valleys[-1]]
     return (df_sliced.drop('timestamp', axis=1).mean()**2).sum()
+
+def fitness_avg_force(measurements, plot=False):
+    """
+    Interpolates sensor data between the first and last detected peaks and calculates the mean
+    of the interpolated 'Fy' and 'Fz' columns to compute a score as the Euclidean norm.
+
+    :param measurements: (pandas.DataFrame) A DataFrame containing sensor data with at least 'Time',
+                                       'Fy', and 'Fz' columns.
+
+    :return: score: (float) The Euclidean norm of the mean values of 'Fy' and 'Fz' from the
+                     interpolated data.
+    """
+
+    df = measurements.copy()
+    # Find peaks (adjust parameters as discussed previously)
+    peaks, _ = find_peaks(df['Fz'], height=-400, distance=10)
+    df_sliced = df.iloc[peaks[0]:peaks[-1] + 1].reset_index(drop=True)
+    # Now create the new time series with 1000 points
+    new_time = np.linspace(df_sliced['Time'].min(), df_sliced['Time'].max(), 1000)
+    # Initialize a new DataFrame to store the interpolated values
+    interpolated_df = pd.DataFrame(index=new_time)
+
+    # Interpolate each sensor column
+    for column in df_sliced.columns:
+        if column != 'Time':
+            # Create the interpolation function
+            interp_func = interp1d(df_sliced['Time'], df_sliced[column], kind='linear', fill_value='extrapolate')
+            # Apply the interpolation function to the new time series
+            interpolated_df[column] = interp_func(new_time)
+
+    # Reset the index to make 'Time' a column again
+    interpolated_df.reset_index(inplace=True)
+    interpolated_df.rename(columns={'index': 'Time'}, inplace=True)
+
+    # interpolated_df now contains 1000 interpolated data points based on the 'Time' column.
+
+    Fy, Fz = interpolated_df.mean()[['Fy', 'Fz']]
+    score = np.sqrt(Fy ** 2 + Fz ** 2)
+
+    if plot:
+        # Create the base line plot
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+        # Plot 'Fz' column
+        ax1.plot(df['Time'], df['Fz'], label='Fz')
+        ax1.plot(df['Time'], df['Fy'], label='Fy', zorder=1)
+        # Plot the peaks
+        ax1.scatter(df['Time'][peaks], df['Fz'][peaks], color='red', s=10, label='Peaks', zorder=5)
+        # Adding title and labels
+        ax1.legend()
+        ax1.set_title('Peaks found')
+        ax1.set_xlabel('Time')
+        ax1.set_ylabel('Force')
+        # Setting up a simple plot with equal scaling on the axes
+        # Setting the aspect of the plot to be equal.
+        ax2.set_aspect('equal', adjustable='box')
+
+        # Drawing a simple line for demonstration
+        ax2.plot(df_sliced.Fy, df_sliced.Fz, zorder=1)
+        ax2.scatter(Fy, Fz, c='r', marker='*')
+        ax2.scatter(0, 0, c='g', marker='+')
+        ax2.arrow(0, 0, Fy, Fz, head_width=40, head_length=40)
+
+        # Setting labels for the axes
+        ax2.set_xlabel('Fy')
+        ax2.set_ylabel('Fz')
+        ax2.set_xlim(-500, 500)
+        ax2.set_ylim(-1000, 500)
+        ax2.set_title(f'Score: {round(score, 2)}')
+
+        # Display the plot
+        plt.show()
+
+    return score
 
 
 

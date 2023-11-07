@@ -1,4 +1,0 @@
-In this test I tried to used for the first time half-successfully the optimization of the attack angle. For some reason
-sometimes the ESP8266 resets, I believe it is related to the current draw by high motor power, never the less in this
-it did not happen, but instead sometimes the angle servo stopped strongly pulling and the Batbot falled during the
-experiment.

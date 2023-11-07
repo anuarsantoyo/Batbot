@@ -1,6 +1,0 @@
-For this experiment I increased the motor value range from 260-270 to 260-275 because I am now directly powering the
-Pyboard from the power source so that appeared to make a change. I am also trying for the firstim the fitness_mse().
-This is to reduce the force in total and not only making the mean force be close to zero.
-
-We notice that using the fitness_mse() The Batbot tends to go more towards low frequencies and horizontal position,
-which make sense as no necesarily hovering but simply lowest force is being rewarded.

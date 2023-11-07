@@ -1,1 +1,0 @@
-same problem as before, not able to find cause of servo apendejating.

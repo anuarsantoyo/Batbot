@@ -1,0 +1,2 @@
+Using the results of experiments/optimizer_batbotV2_2D/data/230920/test_folding2 we chose motor to be 0.9 and
+attack angle to be 0.3. And we also will use fitness_mean() here. From optimizer 14 I started at the 230921

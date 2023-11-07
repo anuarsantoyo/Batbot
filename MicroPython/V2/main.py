@@ -29,50 +29,41 @@ FLAPPER = 5
 folded = 160
 extended = 50
 
-# Calculate max and min angles (for some weir reason they consantly change)
-#pca.duty(FLAPPER,200)
-#time.sleep(3)
-#pca.duty(FLAPPER,260)
-#maxes = []
-#mines = []
-#angle_0 = 0
-#angle_1 = 0
-#angle_2 = 0
 
-#for i in range(500):
-#    angle_0 = angle_1
-#    angle_1 = angle_2
-#    angle_2 = mag.read_angle()
-#    if (angle_1>angle_0) and (angle_1>angle_2):
-#        maxes.append(angle_1)
-#    elif (angle_1<angle_0) and (angle_1<angle_2):
-#        mines.append(angle_1)
-#    time.sleep(0.01)
-
-#def median(lst):
-#    sorted_lst = sorted(lst)
-#    lst_len = len(sorted_lst)
-    
-    # If the list has an odd number of items, return the middle one
-#    if lst_len % 2 == 1:
-#        return sorted_lst[lst_len // 2]
-    # If the list has an even number of items, return the average of the two middle ones
-#    else:
-#        left_mid = sorted_lst[(lst_len - 1) // 2]
-#        right_mid = sorted_lst[lst_len // 2]
-#        return (left_mid + right_mid) / 2
-
-#angle_max = median(maxes)
-#angle_min = median(mines)
-
-angle_max = 331
-angle_min = 299
 
 # Motors initialization
-pca.duty(FLAPPER, 260)
-#servos.position(ATTACK, 120)
+print('Iniitializing...')
 servos.position(FOLDER, extended)
-utime.sleep(3)
+pca.duty(FLAPPER, 200)
+time.sleep(1)
+pca.duty(FLAPPER, 260)
+time.sleep(1)
+print('Iniitialized!')
+# Initialize angle max, min
+angles = []
+
+i = 0
+
+print('Calculating min/max...')
+start_time = utime.ticks_ms()
+while utime.ticks_diff(utime.ticks_ms(), start_time) < 3000:
+    i += 1
+    time.sleep(0.01)
+    if i < 250:
+        angle = mag.read_angle()
+        angles.append(angle)
+    else:
+        break
+
+angles = angles[-150:]
+angle_max = max(angles)
+angle_min = min(angles)
+print('Calculated!')
+print('Max angle:', angle_max)
+print('Min angle:', angle_min)
+pca.duty(FLAPPER, 200)
+
+
 
 while True:
     response = uart.read()  # read command
@@ -80,37 +71,42 @@ while True:
         print(response)
         data_str = response.decode('utf-8')
         numbers = data_str.split(',')
-        motor, attack_angle, leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle \
+        motor, leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle \
             = [float(num) for num in numbers]  # Extract command
 
         pca.duty(FLAPPER, motor)
-        #servos.position(ATTACK, attack_angle)
-        
-        start_time = utime.ticks_ms()
-        duration = 6500  # 7.5 seconds
 
+        duration = 6500  # 7.5 seconds
         old_angle = mag.read_angle()  # Used to calculate derivative which gives stroke direction
+        start_time = utime.ticks_ms()
+
         while utime.ticks_diff(utime.ticks_ms(), start_time) < duration:  # Run as long as stated experiment duration
             utime.sleep(0.001)  #  Used to stabiize the loop, if not added time measurement fails.
+
             new_angle = mag.read_angle()
-            upward = new_angle > old_angle  # Calculate wing beat direction
-            cyc = (new_angle-angle_min)/(angle_max-angle_min)  # down:0 up:1
-            print(new_angle, cyc)
+            angles.append(new_angle)
+            del angles[0]
+            angle_max = max(angles)
+            angle_min = min(angles)
+
+            upward = new_angle < old_angle  # Calculate wing beat direction
+            cyc = 1 - (new_angle - angle_min) / (angle_max - angle_min)  # down:0 up:1
+            print(cyc)
+
             if upward:
                 pi_cyc = math.pi * cyc  # [0,pi]
             else:
                 pi_cyc = 2 * math.pi - math.pi * cyc  # [pi, 2pi]
 
-            if cyc > 0.5:
-                fold = extended  # after halfway up, start extending
-            elif cyc < 0.2:
-                fold = folded  # 20% before reaching down, start folding
+            if cyc > 0.6:
+                fold = extended  # after half way up star extending
+            elif cyc < 0.15:
+                fold = folded  # 20% before reaching down start folding
             elif upward:
-                fold = folded  #  up-stroke fold
+                fold = folded
             else:
                 fold = extended  # down-stroke extend
 
-            #servos.position(FOLDER, extended) # uncomment if you want to disable folding
             servos.position(FOLDER, fold)
             old_angle = new_angle
 
@@ -139,7 +135,6 @@ while True:
             servos.position(RL_x, RL_x_angle)
             servos.position(LL_x, LL_x_angle)
 
-            #servos.position(ATTACK, attack_angle)
             pca.duty(FLAPPER, motor)
 
         uart.read()  # in case data was sent while in the loop it is deleted
