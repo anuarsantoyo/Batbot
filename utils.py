@@ -11,7 +11,7 @@ import pandas as pd
 from scipy.interpolate import interp1d
 
 sensors_col = ['Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz']
-calib = pd.read_csv('/home/anuarsantoyo/PycharmProjects/Batbot/analysis/forces/data/df_calib3.csv').mean()
+calib = pd.read_csv('/home/anuarsantoyo/PycharmProjects/Batbot/analysis/forces/data/df_calib.csv').mean()
 calib['Time'] = 0
 #sensors_col = [f'sensor_{i}' for i in range(1, 7)]
 #calibration = pd.read_csv('/analysis/sensor_calibration_BSQJNP8.csv')
@@ -93,7 +93,7 @@ def command_batbotV2_2D(solution, port):
     print("Sent!")
 
 
-def command_batbotV2_5D(solution, port):
+def command_batbotV2_6D(solution, port):
     """
     This function takes a proposed solution from the CMA optimization and commands the robot run it.
     :param solution: list of proposed solutions [motor, attack_angle, neutral_state, amplitude]
@@ -101,12 +101,37 @@ def command_batbotV2_5D(solution, port):
     :return: None
     """
     motor, leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle = solution
-    motor = np.interp(motor, [0, 1], [260, 275])
-    leg_x = np.interp(leg_x, [0, 1], [50, 140])
-    leg_y = np.interp(leg_y, [0, 1], [0, 180])
-    leg_x_amplitude = np.interp(leg_x_amplitude, [0, 1], [0, 45])
-    leg_y_amplitude = np.interp(leg_y_amplitude, [0, 1], [0, 90])
+    motor = np.interp(motor, [0, 1], [260, 270])
+    leg_x = np.interp(leg_x, [0, 1], [40, 120])
+    leg_y = np.interp(leg_y, [0, 1], [30, 150])
+    leg_x_amplitude = np.interp(leg_x_amplitude, [0, 1], [0, 40])
+    leg_y_amplitude = np.interp(leg_y_amplitude, [0, 1], [0, 60])
     print(f"Sending command to batbot "
+          f"leg_x: {leg_x}\n"
+          f"leg_y: {leg_y}\n"
+          f"leg_x_amplitude: {leg_x_amplitude}\n"
+          f"leg_y_amplitude: {leg_y_amplitude}\n"
+          f"Ellipse: {ellipse_angle}")
+    ser = serial.Serial(port=port, baudrate=115200, bytesize=8, parity='N', stopbits=1)
+    ser.write(str.encode(f'{motor},{leg_x},{leg_y},{leg_x_amplitude},{leg_y_amplitude},{ellipse_angle}'))
+    print("Sent!\n")
+
+def command_batbotV2_4D(solution, port):
+    """
+    This function takes a proposed solution from the CMA optimization and commands the robot run it.
+    :param solution: list of proposed solutions [motor, attack_angle, neutral_state, amplitude]
+    :param port: port of the wireless uart module.
+    :return: None
+    """
+    leg_x, leg_y, leg_x_amplitude, leg_y_amplitude = solution
+    motor = np.interp(1, [0, 1], [260, 270])
+    leg_x = np.interp(leg_x, [0, 1], [40, 120])
+    leg_y = np.interp(leg_y, [0, 1], [30, 150])
+    leg_x_amplitude = np.interp(leg_x_amplitude, [0, 1], [0, 40])
+    leg_y_amplitude = np.interp(leg_y_amplitude, [0, 1], [0, 60])
+    ellipse_angle = 1
+    print(f"Sending command to batbot "
+          f"motor: {motor}\n"
           f"leg_x: {leg_x}\n"
           f"leg_y: {leg_y}\n"
           f"leg_x_amplitude: {leg_x_amplitude}\n"
@@ -553,7 +578,7 @@ def read_measurements_df_6axis(port='/dev/ttyUSB0', duration=10, calibration=Fal
 
         time_points.append(time.time() - (end_time - duration))  # Record the measurement time
 
-        time.sleep(0.01)  # Interval of 0.1 seconds
+        time.sleep(0.003)  # Interval of 0.1 seconds
 
     # Convert data to a DataFrame for easy plotting with Plotly Express
     labels = ['Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz']

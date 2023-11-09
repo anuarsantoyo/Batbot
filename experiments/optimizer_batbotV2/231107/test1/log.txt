@@ -1,0 +1,19 @@
+This was the first optimization using the new sensor, we can see that the score calculation works fine. I detected some
+issues with the way the leg rotate that will be looked into and I realize that everytime I start training session by
+loading old optimizers there is a strong increase in the score, I will look into the optimizers and see the development
+of the covariance matrix to see if its reasonable (stetig).
+
+Parameters used:
+    motor = np.interp(motor, [0, 1], [260, 275])
+    leg_x = np.interp(leg_x, [0, 1], [50, 140])
+    leg_y = np.interp(leg_y, [0, 1], [0, 180])
+    leg_x_amplitude = np.interp(leg_x_amplitude, [0, 1], [0, 45])
+    leg_y_amplitude = np.interp(leg_y_amplitude, [0, 1], [0, 90])
+
+
+    motor = np.interp(motor, [0, 1], [260, 280])
+    leg_x = np.interp(leg_x, [0, 1], [40, 140])
+    leg_y = np.interp(leg_y, [0, 1], [30, 150])
+    leg_x_amplitude = np.interp(leg_x_amplitude, [0, 1], [0, 50])
+    leg_y_amplitude = np.interp(leg_y_amplitude, [0, 1], [0, 60])
+... Both things were made, the leg movement was corrected and the optimizer loading seems to be fine.

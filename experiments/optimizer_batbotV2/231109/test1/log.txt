@@ -1,0 +1,20 @@
+So I changed a gear that was faulty and kept the motor and ellipse constant at one. Now I am only training for the
+optimal legx,y and x,y amplitudes.
+These are my used parameters:
+
+motor = np.interp(1, [0, 1], [260, 270])
+leg_x = np.interp(leg_x, [0, 1], [40, 120])
+leg_y = np.interp(leg_y, [0, 1], [30, 150])
+leg_x_amplitude = np.interp(leg_x_amplitude, [0, 1], [0, 40])
+leg_y_amplitude = np.interp(leg_y_amplitude, [0, 1], [0, 60])
+ellipse_angle = 1
+
+I also disabled the min max angle correction in the Batbot as I am always using the same motor speed
+The results seem to not converge, I see 3 possible problems:
+
+- The folding seems to be a bit off, need deeper look into (Done! tightened some screws on the wings, that seems to
+have made it)
+- The membrane in the legs seems loose (the gear also sounds funny)
+- The sensor has low data frequency (done!)
+
+Might consider doing "Wartung" after each test

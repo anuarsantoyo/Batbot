@@ -1,0 +1,11 @@
+this parameters where used:
+motor = np.interp(motor, [0, 1], [260, 280])
+leg_x = np.interp(leg_x, [0, 1], [40, 120])
+leg_y = np.interp(leg_y, [0, 1], [30, 150])
+leg_x_amplitude = np.interp(leg_x_amplitude, [0, 1], [0, 40])
+leg_y_amplitude = np.interp(leg_y_amplitude, [0, 1], [0, 60])
+
+I am going to do the next experiment using motor from 260-270 because if the Batbot breaks I am in big problem.
+But the results looked good. Again the best scores are achieved with high motor and high ellipse, an idea could be to
+in the future fix motor and ellipse to 1.
+

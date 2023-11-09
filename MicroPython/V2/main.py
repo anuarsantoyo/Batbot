@@ -32,7 +32,7 @@ extended = 50
 
 
 # Motors initialization
-print('Iniitializing...')
+print('Initializing...')
 servos.position(FOLDER, extended)
 pca.duty(FLAPPER, 200)
 time.sleep(1)
@@ -49,13 +49,12 @@ start_time = utime.ticks_ms()
 while utime.ticks_diff(utime.ticks_ms(), start_time) < 3000:
     i += 1
     time.sleep(0.01)
-    if i < 250:
+    if i < 200:
         angle = mag.read_angle()
         angles.append(angle)
     else:
         break
 
-angles = angles[-150:]
 angle_max = max(angles)
 angle_min = min(angles)
 print('Calculated!')

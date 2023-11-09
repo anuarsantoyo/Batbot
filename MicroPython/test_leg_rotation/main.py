@@ -28,11 +28,11 @@ extended = 50
 
 # Parameters
 leg_y = 90
-leg_y_amplitude = 30
+leg_y_amplitude = 90
 leg_x = 40  # 50-140
-leg_x_amplitude = 30
+leg_x_amplitude = 20
 ellipse_angle = 1
-motor = 260
+motor = 270
 
 
 # 50-160 extended-folded
