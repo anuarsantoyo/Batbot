@@ -32,7 +32,7 @@ leg_y_amplitude = 90
 leg_x = 40  # 50-140
 leg_x_amplitude = 20
 ellipse_angle = 1
-motor = 270
+motor = 265
 
 
 # 50-160 extended-folded

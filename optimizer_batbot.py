@@ -24,8 +24,8 @@ print('Calibrated!')
 
 # Start the CMA optimizer  # TODO: double check
 pop_size = 10
-n_generation = 20
-save_directory = "experiments/optimizer_batbotV2/231109/test2/"  # TODO: dir
+n_generation = 15
+save_directory = "experiments/optimizer_batbotV2/231109/test3/"  # TODO: dir
 load = False
 if load:
     file = open(save_directory+'optimizers/optimizer_17.pickle', 'rb')
@@ -65,7 +65,13 @@ for generation in range(generation_0, generation_0+n_generation):
     for i in range(optimizer.population_size):
         print(f"Test: {i+1}/{pop_size}")
         x = optimizer.ask()
-        command_batbotV2_4D(x, command_port)  # TODO: dim
+        # motor, leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle = x
+        leg_x, leg_y, leg_x_amplitude, leg_y_amplitude = x
+        motor = 1
+        ellipse_angle = 1
+        cmd = motor, leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle  # TODO: dim
+
+        command_batbot_V2(cmd, command_port)
         time.sleep(1)  # To allow the Batbot to reach the attack angle and flapping speed
         measurements = read_measurements_df_6axis(port=daq_port, duration=5) + correction
         score = fitness_avg_force(measurements, plot=True)
