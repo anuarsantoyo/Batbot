@@ -15,7 +15,7 @@ command_port = "/dev/ttyACM2"
 # Sensor calibration
 # calib - current = correction -> correct = current + correction
 print('Calibrating Sensor...')
-calib = pd.read_csv('/home/anuarsantoyo/PycharmProjects/Batbot/analysis/forces/data/df_mounted.csv').mean()
+calib = pd.read_csv('/analysis/forces/231115/data/df_mounted.csv').mean()
 calib['Time'] = 0
 current_sensor = read_measurements_df_6axis(port=daq_port, duration=5).mean()
 current_sensor['Time'] = 0
@@ -69,7 +69,7 @@ for generation in range(generation_0, generation_0+n_generation):
         leg_x, leg_y, leg_x_amplitude, leg_y_amplitude = x
         motor = 1
         ellipse_angle = 1
-        cmd = motor, leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle  # TODO: dim
+        cmd = (motor, leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle)  # TODO: dim
 
         command_batbot_V2(cmd, command_port)
         time.sleep(1)  # To allow the Batbot to reach the attack angle and flapping speed

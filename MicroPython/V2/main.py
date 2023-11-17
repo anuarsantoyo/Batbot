@@ -26,11 +26,11 @@ LL_x = 2
 LL_y = 3
 FOLDER = 4
 FLAPPER = 5
-folded = 160
+folded = 140
 extended = 50
 
 
-
+time.sleep(3)
 # Motors initialization
 print('Initializing...')
 servos.position(FOLDER, extended)
@@ -88,8 +88,8 @@ while True:
             angle_max = max(angles)
             angle_min = min(angles)
 
-            upward = new_angle < old_angle  # Calculate wing beat direction
-            cyc = 1 - (new_angle - angle_min) / (angle_max - angle_min)  # down:0 up:1
+            upward = new_angle > old_angle  # Calculate wing beat direction
+            cyc = (new_angle - angle_min) / (angle_max - angle_min)  # down:0 up:1
             print(cyc)
 
             if upward:

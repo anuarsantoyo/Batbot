@@ -1,2 +1,0 @@
-We tried the same experiment but using the fitness_mean() which is the same as fitness_project() but solving the
-changing score due to tail values with peak-valley slicing instead of projecting scores.

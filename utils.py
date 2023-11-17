@@ -11,7 +11,7 @@ import pandas as pd
 from scipy.interpolate import interp1d
 
 sensors_col = ['Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz']
-calib = pd.read_csv('/home/anuarsantoyo/PycharmProjects/Batbot/analysis/forces/data/df_calib.csv').mean()
+calib = pd.read_csv('/home/anuarsantoyo/PycharmProjects/Batbot/analysis/forces/231115/data/df_calib.csv').mean()
 calib['Time'] = 0
 
 
@@ -52,22 +52,15 @@ def fitness_mse(measurements):
     df_sliced = measurements.iloc[peaks[0]: peaks[-1]]
     return (df_sliced.drop('timestamp', axis=1) ** 2).mean().sum()
 
-
-def fitness_avg_force(measurements, plot=False):
+def peak_slice_interpolate(measurements, args = {'peak_height':-400, 'peak_distance':10}):
     """
-    Interpolates sensor data between the first and last detected peaks and calculates the mean
-    of the interpolated 'Fy' and 'Fz' columns to compute a score as the Euclidean norm.
-
-    :param measurements: (pandas.DataFrame) A DataFrame containing sensor data with at least 'Time',
-                                       'Fy', and 'Fz' columns.
-
-    :return: score: (float) The Euclidean norm of the mean values of 'Fy' and 'Fz' from the
-                     interpolated data.
+    Interpolates sensor data between the first and last detected peaks and c
+    :param measurements:  (pandas.DataFrame) A DataFrame containing sensor data.
+    :return: Interpolated data after slicing from first to last peak
     """
-
     df = measurements.copy()
     # Find peaks (adjust parameters as discussed previously)
-    peaks, _ = find_peaks(df['Fz'], height=-400, distance=10)
+    peaks, _ = find_peaks(df['Fz'], height=args['peak_height'], distance=args['peak_distance'])
     df_sliced = df.iloc[peaks[0]:peaks[-1] + 1].reset_index(drop=True)
     # Now create the new time series with 1000 points
     new_time = np.linspace(df_sliced['Time'].min(), df_sliced['Time'].max(), 1000)
@@ -85,6 +78,21 @@ def fitness_avg_force(measurements, plot=False):
     # Reset the index to make 'Time' a column again
     interpolated_df.reset_index(inplace=True)
     interpolated_df.rename(columns={'index': 'Time'}, inplace=True)
+    return interpolated_df, peaks
+
+def fitness_avg_force(measurements, plot=False, args = {'peak_height':-400, 'peak_distance':10}):
+    """
+    Interpolates sensor data between the first and last detected peaks and calculates the mean
+    of the interpolated 'Fy' and 'Fz' columns to compute a score as the Euclidean norm.
+
+    :param measurements: (pandas.DataFrame) A DataFrame containing sensor data with at least 'Time',
+                                       'Fy', and 'Fz' columns.
+
+    :return: score: (float) The Euclidean norm of the mean values of 'Fy' and 'Fz' from the
+                     interpolated data.
+    """
+    df = measurements.copy()
+    interpolated_df, peaks = peak_slice_interpolate(df, args)
 
     # interpolated_df now contains 1000 interpolated data points based on the 'Time' column.
 
@@ -109,7 +117,7 @@ def fitness_avg_force(measurements, plot=False):
         ax2.set_aspect('equal', adjustable='box')
 
         # Drawing a simple line for demonstration
-        ax2.plot(df_sliced.Fy, df_sliced.Fz, zorder=1)
+        ax2.plot(interpolated_df.Fy, interpolated_df.Fz, zorder=1)
         ax2.scatter(Fy, Fz, c='r', marker='*')
         ax2.scatter(0, 0, c='g', marker='+')
         ax2.arrow(0, 0, Fy, Fz, head_width=40, head_length=40)
@@ -117,8 +125,6 @@ def fitness_avg_force(measurements, plot=False):
         # Setting labels for the axes
         ax2.set_xlabel('Fy')
         ax2.set_ylabel('Fz')
-        ax2.set_xlim(-500, 500)
-        ax2.set_ylim(-1000, 500)
         ax2.set_title(f'Score: {round(score, 2)}')
 
         # Display the plot
@@ -136,12 +142,28 @@ def twos_complement(value, bits):
 
 def read_measurements_df_6axis(port='/dev/ttyUSB0', duration=10, calibration=False):
     '''
+    This function reads the measurements from a 6-axis force/torque sensor connected via Modbus RTU.
+    It collects data for a specified duration and returns a pandas DataFrame with the measurements.
 
-    :param port:
-    :param duration:
-    :param calibration:
-    :return:
+    The DataFrame includes time-series data for force and torque measurements along and around
+    the X, Y, and Z axes. If a calibration setting is applied, the function can also return calibrated data.
+
+    :param port: str, optional
+        The serial port to which the sensor is connected. Default is '/dev/ttyUSB0'.
+    :param duration: int or float, optional
+        The duration in seconds for which to collect data from the sensor. Default is 10 seconds.
+    :param calibration: bool
+
+    :return: pandas.DataFrame
+        A DataFrame containing the time-series data for the 6-axis measurements. Each force measurement
+        is in Newtons and each torque measurement is in Newton-meters, with appropriate scaling applied.
+
+    The returned DataFrame has the following columns:
+    - 'Time': The time points of the measurement in seconds.
+    - 'Fxyz': The force measurement along the XYZ-axis in Newtons.
+    - 'Mxyz': The torque measurement around the XYZ-axis in Newton-meters.
     '''
+
     # Setting up the Modbus RTU connection
     instrument = minimalmodbus.Instrument(port, 1)
     instrument.serial.baudrate = 115200
@@ -176,6 +198,9 @@ def read_measurements_df_6axis(port='/dev/ttyUSB0', duration=10, calibration=Fal
         df[label] = data
     df['Mx'] = -df['Mx']
     df['Mz'] = -df['Mz']
+    df[['Mx', 'My', 'Mz']] = df[['Mx', 'My', 'Mz']] / 10000
+    df[['Fx', 'Fy', 'Fz']] = df[['Fx', 'Fy', 'Fz']] / 100
+
     if calibration:
         return df-calib
     else:

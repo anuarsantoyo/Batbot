@@ -6,6 +6,7 @@ import as5048a
 import time
 import math
 
+
 i2c = machine.SoftI2C("X9", "X10", freq=100000)
 pca = pca9685.PCA9685(i2c)
 servos = pca9685_servo.Servos(pca)
@@ -22,24 +23,25 @@ RL_y = 1
 FOLDER = 4
 FLAPPER = 5
 ATTACK = 6
-folded = 160
+folded = 140
 extended = 50
 
 
 # Parameters
 leg_y = 90
-leg_y_amplitude = 90
-leg_x = 40  # 50-140
-leg_x_amplitude = 20
+leg_y_amplitude = 30
+leg_x = 40  
+leg_x_amplitude = 40
 ellipse_angle = 1
-motor = 265
+motor = 275
 
 
 # 50-160 extended-folded
 #servos.position(ATTACK, attack_angle)
+time.sleep(3)
 servos.position(FOLDER, extended)
-pca.duty(FLAPPER,200)
-time.sleep(1)
+pca.duty(FLAPPER, 200)
+time.sleep(5)
 
 pca.duty(FLAPPER, motor)
 
@@ -106,10 +108,10 @@ while True:
     angle_max = max(angles)
     angle_min = min(angles)
     
-    upward = new_angle < old_angle  # Calculate wing beat direction
+    upward = new_angle > old_angle  # Calculate wing beat direction
     
     
-    cyc = 1 - (new_angle-angle_min)/(angle_max-angle_min) # down:0 up:1
+    cyc = (new_angle-angle_min)/(angle_max-angle_min) # down:0 up:1
             
     if upward:
         pi_cyc = math.pi*cyc
@@ -117,10 +119,10 @@ while True:
         pi_cyc = 2*math.pi - math.pi*cyc
 
     
-    if cyc>0.6:
-        fold = extended # after half way up star extending
-    elif cyc<0.15:
-        fold = folded # 20% before reaching down start folding
+    if cyc > 0.6:
+        fold = extended  # after half way up star extending
+    elif cyc < 0.15:
+        fold = folded  # 20% before reaching down start folding
     elif upward:
         fold = folded
     else:
@@ -136,10 +138,10 @@ while True:
     elif y_theta > 150:
         y_theta = 150
     LL_y_angle = y_theta
-    RL_y_angle =  180 - y_theta
+    RL_y_angle = 180 - y_theta
         
     x_theta = leg_x + leg_x_amplitude*math.sin(pi_cyc + 2*math.pi*ellipse_angle)
-    if x_theta<40:
+    if x_theta < 40:
         x_theta = 40
     elif x_theta > 120:
         x_theta = 120
