@@ -18,6 +18,7 @@ mag = as5048a.AS5048A(as5048_spi, as5048_cs)
 
 LL_x = 2
 LL_y = 3
+
 RL_x = 0
 RL_y = 1
 FOLDER = 4
@@ -29,9 +30,9 @@ extended = 50
 
 # Parameters
 leg_y = 90
-leg_y_amplitude = 30
+leg_y_amplitude = 0
 leg_x = 40  
-leg_x_amplitude = 40
+leg_x_amplitude = 0
 ellipse_angle = 1
 motor = 275
 
@@ -130,7 +131,7 @@ while True:
         
     servos.position(FOLDER, fold)
     old_angle = new_angle
-    print(cyc)#, new_angle)
+    print(new_angle)  #, cyc)
     
     y_theta = leg_y - leg_y_amplitude*math.cos(pi_cyc)        
     if y_theta < 30:

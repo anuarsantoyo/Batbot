@@ -9,23 +9,17 @@ import plotly.express as px
 from pandas.plotting import parallel_coordinates
 
 # Connection details
-daq_port = "/dev/ttyUSB0"  # Find port using !python -m serial.tools.list_ports
-command_port = "/dev/ttyACM2"
+daq_port = "/dev/ttyUSB2"  # Find port using !python -m serial.tools.list_ports
+command_port = "/dev/ttyACM0"
 
 # Sensor calibration
-# calib - current = correction -> correct = current + correction
-print('Calibrating Sensor...')
-calib = pd.read_csv('/analysis/forces/231115/data/df_mounted.csv').mean()
-calib['Time'] = 0
-current_sensor = read_measurements_df_6axis(port=daq_port, duration=5).mean()
-current_sensor['Time'] = 0
-correction = calib - current_sensor
-print('Calibrated!')
+calib = pd.read_csv('/home/anuarsantoyo/PycharmProjects/Batbot/analysis/forces/231116/data/calib_corrected.csv', index_col=0).iloc[:,0]
+
 
 # Start the CMA optimizer  # TODO: double check
 pop_size = 10
-n_generation = 15
-save_directory = "experiments/optimizer_batbotV2/231109/test3/"  # TODO: dir
+n_generation = 20
+save_directory = "experiments/optimizer_batbotV2/231118/test1/"  # TODO: dir
 load = False
 if load:
     file = open(save_directory+'optimizers/optimizer_17.pickle', 'rb')
@@ -35,17 +29,18 @@ if load:
     file.close()
     results = pd.read_csv(save_directory+'results.csv')
 else:
-    optimizer = CMA(mean=np.array([0.5 for i in range(4)]),  # TODO: dim
+    optimizer = CMA(mean=np.array([0.5 for i in range(5)]),  # TODO: dim
                     sigma=0.5,
                     population_size=pop_size,
-                    bounds=np.array([[0, 1] for i in range(4)]))  # TODO: dim
+                    bounds=np.array([[0, 1] for i in range(5)]))  # TODO: dim
     results = pd.DataFrame(columns=['Generation',
                                     'Id',
                                     'Score',
                                     'Leg x',
                                     'Leg y',
                                     'Amplitude x',
-                                    'Amplitude y'])  # TODO: dim
+                                    'Amplitude y',
+                                    'Ellipse'])  # TODO: dim
     generation_0 = 0
 
 # df to plot scores
@@ -66,14 +61,14 @@ for generation in range(generation_0, generation_0+n_generation):
         print(f"Test: {i+1}/{pop_size}")
         x = optimizer.ask()
         # motor, leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle = x
-        leg_x, leg_y, leg_x_amplitude, leg_y_amplitude = x
+        leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle = x  # TODO: dim
         motor = 1
-        ellipse_angle = 1
-        cmd = (motor, leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle)  # TODO: dim
+
+        cmd = (motor, leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle)
 
         command_batbot_V2(cmd, command_port)
         time.sleep(1)  # To allow the Batbot to reach the attack angle and flapping speed
-        measurements = read_measurements_df_6axis(port=daq_port, duration=5) + correction
+        measurements = read_measurements_df_6axis(port=daq_port, duration=5) - calib
         score = fitness_avg_force(measurements, plot=True)
         print(f"Result: {score}")
         print("-" * 10)
@@ -83,15 +78,14 @@ for generation in range(generation_0, generation_0+n_generation):
         measurements.to_csv(save_directory + f"measurements/{generation}_{i}({round(score,2)}).csv", index=False)
         solutions.append((x, score))
 
-        #motor, leg_x, leg_y, leg_x_amplitude, leg_y_amplitude, ellipse_angle = x  # TODO:dim
-        leg_x, leg_y, leg_x_amplitude, leg_y_amplitude = x
         df_dict_list.append({'Generation': generation,
                              'Id': i,
                              'Score': score,
                              'Leg x': leg_x,
                              'Leg y': leg_y,
                              'Amplitude x': leg_x_amplitude,
-                             'Amplitude y': leg_y_amplitude})
+                             'Amplitude y': leg_y_amplitude,
+                             'Ellipse': ellipse_angle})  # TODO:dim
 
     optimizer.tell(solutions)
     df = pd.DataFrame(df_dict_list)
@@ -126,6 +120,46 @@ for generation in range(generation_0, generation_0+n_generation):
     plt.ylabel('Parameter Value')
     plt.xticks(rotation=45)
     plt.tight_layout()  # Ensures that all elements of the plot fit well
+    # Add color bar
+    sm = plt.cm.ScalarMappable(cmap='viridis',
+                               norm=plt.Normalize(vmin=results['Score'].min(), vmax=results['Score'].max()))
+    sm.set_array([])  # You need to set the array for the scalar mappable even if not used
+    plt.colorbar(sm, label='Score')
+
     plt.savefig(save_directory + "results.jpg")
     plt.show()
 
+# Dummy data creation for demonstration purposes
+# Assuming 'results' is a DataFrame with a 'Score' column which we want to use as class column
+np.random.seed(0)
+results = pd.DataFrame({
+    'Parameter A': np.random.rand(10),
+    'Parameter B': np.random.rand(10),
+    'Parameter C': np.random.rand(10),
+    'Score': np.random.randint(1, 100, 10)
+})
+
+# Plotting parallel coordinates with a colormap and adding a colorbar
+plt.figure(figsize=(12, 6))
+
+# Create the parallel coordinates plot
+parallel_coordinates(results, class_column='Score', colormap='viridis', alpha=0.5)
+
+# Hide the legend if not needed
+plt.legend().set_visible(False)
+
+# Set the title and labels
+plt.title('Parallel Coordinates Plot')
+plt.ylabel('Parameter Value')
+plt.xticks(rotation=45)
+
+# Ensure that all elements of the plot fit well within the figure
+plt.tight_layout()
+
+# Add color bar
+sm = plt.cm.ScalarMappable(cmap='viridis', norm=plt.Normalize(vmin=results['Score'].min(), vmax=results['Score'].max()))
+sm.set_array([])  # You need to set the array for the scalar mappable even if not used
+plt.colorbar(sm, label='Score')
+
+# Show the plot
+plt.show()

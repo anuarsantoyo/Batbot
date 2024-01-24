@@ -35,7 +35,7 @@ time.sleep(3)
 print('Initializing...')
 servos.position(FOLDER, extended)
 pca.duty(FLAPPER, 200)
-time.sleep(1)
+time.sleep(3)
 pca.duty(FLAPPER, 260)
 time.sleep(1)
 print('Iniitialized!')
@@ -92,11 +92,6 @@ while True:
             cyc = (new_angle - angle_min) / (angle_max - angle_min)  # down:0 up:1
             print(cyc)
 
-            if upward:
-                pi_cyc = math.pi * cyc  # [0,pi]
-            else:
-                pi_cyc = 2 * math.pi - math.pi * cyc  # [pi, 2pi]
-
             if cyc > 0.6:
                 fold = extended  # after half way up star extending
             elif cyc < 0.15:
@@ -107,7 +102,13 @@ while True:
                 fold = extended  # down-stroke extend
 
             servos.position(FOLDER, fold)
+
             old_angle = new_angle
+
+            if upward:
+                pi_cyc = math.pi * cyc  # [0,pi]
+            else:
+                pi_cyc = 2 * math.pi - math.pi * cyc  # [pi, 2pi]
 
             y_theta = leg_y - leg_y_amplitude * math.cos(pi_cyc)  # Calculate angle from body plane to leg in vertical
             if y_theta < 30:  # Stops angle from exceeding limit values (also allowing straight trajectories in leg)

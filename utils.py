@@ -9,10 +9,11 @@ import minimalmodbus
 import time
 import pandas as pd
 from scipy.interpolate import interp1d
+import math
 
 sensors_col = ['Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz']
-calib = pd.read_csv('/home/anuarsantoyo/PycharmProjects/Batbot/analysis/forces/231115/data/df_calib.csv').mean()
-calib['Time'] = 0
+#calib = pd.read_csv('/home/anuarsantoyo/PycharmProjects/Batbot/analysis/forces/231115/data/df_calib.csv').mean()
+#calib['Time'] = 0
 
 
 def command_batbot_V2(command, port):
@@ -52,7 +53,7 @@ def fitness_mse(measurements):
     df_sliced = measurements.iloc[peaks[0]: peaks[-1]]
     return (df_sliced.drop('timestamp', axis=1) ** 2).mean().sum()
 
-def peak_slice_interpolate(measurements, args = {'peak_height':-400, 'peak_distance':10}):
+def peak_slice_interpolate(measurements, args = {'peak_height':0, 'peak_distance':10}):
     """
     Interpolates sensor data between the first and last detected peaks and c
     :param measurements:  (pandas.DataFrame) A DataFrame containing sensor data.
@@ -60,7 +61,7 @@ def peak_slice_interpolate(measurements, args = {'peak_height':-400, 'peak_dista
     """
     df = measurements.copy()
     # Find peaks (adjust parameters as discussed previously)
-    peaks, _ = find_peaks(df['Fz'], height=args['peak_height'], distance=args['peak_distance'])
+    peaks, _ = find_peaks(df['Fy'], height=args['peak_height'], distance=args['peak_distance'])
     df_sliced = df.iloc[peaks[0]:peaks[-1] + 1].reset_index(drop=True)
     # Now create the new time series with 1000 points
     new_time = np.linspace(df_sliced['Time'].min(), df_sliced['Time'].max(), 1000)
@@ -80,7 +81,7 @@ def peak_slice_interpolate(measurements, args = {'peak_height':-400, 'peak_dista
     interpolated_df.rename(columns={'index': 'Time'}, inplace=True)
     return interpolated_df, peaks
 
-def fitness_avg_force(measurements, plot=False, args = {'peak_height':-400, 'peak_distance':10}):
+def fitness_avg_force(measurements, plot=False, args = {'peak_height':0, 'peak_distance':10}):
     """
     Interpolates sensor data between the first and last detected peaks and calculates the mean
     of the interpolated 'Fy' and 'Fz' columns to compute a score as the Euclidean norm.
@@ -97,7 +98,7 @@ def fitness_avg_force(measurements, plot=False, args = {'peak_height':-400, 'pea
     # interpolated_df now contains 1000 interpolated data points based on the 'Time' column.
 
     Fy, Fz = interpolated_df.mean()[['Fy', 'Fz']]
-    score = np.sqrt(Fy ** 2 + Fz ** 2)
+    score = np.sqrt(Fy ** 2 + (Fz - 5.95) ** 2)
 
     if plot:
         # Create the base line plot
@@ -106,7 +107,7 @@ def fitness_avg_force(measurements, plot=False, args = {'peak_height':-400, 'pea
         ax1.plot(df['Time'], df['Fz'], label='Fz')
         ax1.plot(df['Time'], df['Fy'], label='Fy', zorder=1)
         # Plot the peaks
-        ax1.scatter(df['Time'][peaks], df['Fz'][peaks], color='red', s=10, label='Peaks', zorder=5)
+        ax1.scatter(df['Time'][peaks], df['Fy'][peaks], color='red', s=10, label='Peaks', zorder=5)
         # Adding title and labels
         ax1.legend()
         ax1.set_title('Peaks found')
@@ -120,7 +121,7 @@ def fitness_avg_force(measurements, plot=False, args = {'peak_height':-400, 'pea
         ax2.plot(interpolated_df.Fy, interpolated_df.Fz, zorder=1)
         ax2.scatter(Fy, Fz, c='r', marker='*')
         ax2.scatter(0, 0, c='g', marker='+')
-        ax2.arrow(0, 0, Fy, Fz, head_width=40, head_length=40)
+        ax2.arrow(0, 0, Fy, Fz, head_width=0.3, head_length=0.3)
 
         # Setting labels for the axes
         ax2.set_xlabel('Fy')
@@ -202,9 +203,23 @@ def read_measurements_df_6axis(port='/dev/ttyUSB0', duration=10, calibration=Fal
     df[['Fx', 'Fy', 'Fz']] = df[['Fx', 'Fy', 'Fz']] / 100
 
     if calibration:
-        return df-calib
+        return df#-calib
     else:
         return df
+
+def get_angle_degrees(x, y):
+    """
+    Calculate the angle from the positive x-axis to the point (x, y) in degrees.
+
+    :param x: x-coordinate of the point
+    :param y: y-coordinate of the point
+    :return: angle in degrees between 0 and 360
+    """
+    angle_radians = math.atan2(y, x)  # Angle in radians
+    angle_degrees = math.degrees(angle_radians)  # Convert to degrees
+    if angle_degrees < 0:
+        angle_degrees += 360  # Normalize to 0-360 range if negative
+    return angle_degrees
 
 
 
