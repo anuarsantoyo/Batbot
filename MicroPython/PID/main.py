@@ -36,6 +36,7 @@ FLAPPER = 4
 legx_open = 90
 legx_closed = 80
 
+
 def linear_interp(x, x0, y0, x1, y1): # if x is x0 then give y0 back, if x1 then y1
     y = y0 + (x - x0) * (y1 - y0) / (x1 - x0)
     return max(min(y1,y),y0)
@@ -46,9 +47,9 @@ class PID:
         self.Ki = Ki
         self.Kd = Kd
         self.setpoint = setpoint
-        self.sample_time = sample_time
         self.prev_error = 0
         self.integral = 0
+        self.sample_time = sample_time
 
     def compute(self, input_value):
         # Calculate error
@@ -85,16 +86,36 @@ class MovingAverageFilter:
         return sum(self.values) / len(self.values)    
     
     
-pid_pitch = PID(Kp=-0.75, Ki=0, Kd=0, setpoint=-20, sample_time=0.05)
-pid_roll = PID(Kp=-0.75, Ki=0, Kd=0, setpoint=-90, sample_time=0.05)
-window_filter_x = MovingAverageFilter(10) # Example window size
-window_filter_z = MovingAverageFilter(10) # Example window size
+# PID stuff
+sample_time = 0.01
+k_roll_old = 0
+k_pitch_old = 0
+
+#window_filter_x = MovingAverageFilter(10) # Example window size
+#window_filter_z = MovingAverageFilter(10) # Example window size
 time.sleep(1)
 
 while True:
     time.sleep(0.01)
     recv_nbytes=reciever_UART.any()
     if recv_nbytes!=0:
+        
+        #initilaze pid if new k value is found
+        k_roll_new = recv_channels[5]
+        k_pitch_new = recv_channels[6]
+        
+        if k_roll_new != k_roll_old:
+            k_roll_old = k_roll_new
+            kp = k_roll_old/1342  # Normalize 0-1
+            pid_roll = PID(Kp=-1.5*kp, Ki=0, Kd=0, setpoint=-90, sample_time=sample_time)
+            print("Changed roll k: ", kp)
+        
+        if k_pitch_new != k_pitch_old:
+            k_pitch_old = k_pitch_new
+            kp = k_pitch_old/1342  # Normalize 0-1
+            pid_pitch = PID(Kp=-0.75*kp, Ki=0, Kd=0, setpoint=-20, sample_time=sample_time)
+            print("Changed pitch k: ", kp)
+        
         
         recv_data=reciever_UART.read(recv_nbytes)
         for i in recv_data:
@@ -103,7 +124,6 @@ while True:
         use_pid = recv_channels[8] == 0
         motor_raw = recv_channels[2] #0-1342 down-up
         motor = linear_interp(motor_raw, 0, 230, 1342, 400)
-        print(motor)
         pca.duty(FLAPPER, motor)
             
         pitch_raw = recv_channels[1] #0-671-1342 up-middle-down

@@ -133,6 +133,59 @@ def fitness_avg_force(measurements, plot=False, args = {'peak_height':0, 'peak_d
 
     return score
 
+def fitness_avg_thrust_lift(measurements, plot=False, args = {'peak_height':0, 'peak_distance':10}):
+    """
+    Interpolates sensor data between the first and last detected peaks and calculates the mean
+    of the interpolated 'Fy' and 'Fz' columns to compute a score as the Euclidean norm.
+
+    :param measurements: (pandas.DataFrame) A DataFrame containing sensor data with at least 'Time',
+                                       'Fy', and 'Fz' columns.
+
+    :return: score: (float) The Euclidean norm of the mean values of 'Fy' and 'Fz' from the
+                     interpolated data.
+    """
+    df = measurements.copy()
+    interpolated_df, peaks = peak_slice_interpolate(df, args)
+
+    # interpolated_df now contains 1000 interpolated data points based on the 'Time' column.
+
+    Fy, Fz = interpolated_df.mean()[['Fy', 'Fz']]
+    force = np.sqrt(Fy ** 2 + Fz ** 2)
+    angle = np.degrees(np.arctan(Fz/Fy))
+
+    if plot:
+        # Create the base line plot
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+        # Plot 'Fz' column
+        ax1.plot(df['Time'], df['Fz'], label='Fz')
+        ax1.plot(df['Time'], df['Fy'], label='Fy', zorder=1)
+        # Plot the peaks
+        ax1.scatter(df['Time'][peaks], df['Fy'][peaks], color='red', s=10, label='Peaks', zorder=5)
+        # Adding title and labels
+        ax1.legend()
+        ax1.set_title('Peaks found')
+        ax1.set_xlabel('Time')
+        ax1.set_ylabel('Force')
+        # Setting up a simple plot with equal scaling on the axes
+        # Setting the aspect of the plot to be equal.
+        ax2.set_aspect('equal', adjustable='box')
+
+        # Drawing a simple line for demonstration
+        ax2.plot(interpolated_df.Fy, interpolated_df.Fz, zorder=1)
+        ax2.scatter(Fy, Fz, c='r', marker='*')
+        ax2.scatter(0, 0, c='g', marker='+')
+        ax2.arrow(0, 0, Fy, Fz, head_width=0.3, head_length=0.3)
+
+        # Setting labels for the axes
+        ax2.set_xlabel('Fy')
+        ax2.set_ylabel('Fz')
+        ax2.set_title(f'Force: {round(force, 2)}, Angle: {round(angle, 2)}')
+
+        # Display the plot
+        plt.show()
+
+    return Fy, Fz
+
 
 def twos_complement(value, bits):
     """Compute the 2's complement of int value."""
