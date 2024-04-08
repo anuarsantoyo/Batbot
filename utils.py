@@ -39,6 +39,26 @@ def command_batbot_V2(command, port):
     ser.write(str.encode(f'{motor},{leg_x},{leg_y},{leg_x_amplitude},{leg_y_amplitude},{ellipse_angle}'))
     print("Sent!\n")
 
+def command_batbot_mimic(command, port):
+    """
+    This function takes a command and sends it to the Batbot.
+    :param solution: list of commands [motor, attack_angle, neutral_state, amplitude]
+    :param port: port of the wireless uart module.
+    :return: None
+    """
+    x_amp, y_amp, y_mid, delay = command
+    x_amp = np.interp(x_amp, [0, 1], [0, 90])
+    y_amp = np.interp(y_amp, [0, 1], [0, 60])
+    y_mid = np.interp(y_mid, [0, 1], [0, 30])
+    delay = np.interp(delay, [0, 1], [0, 2*np.pi])
+    print(f"Sending command to batbot "
+          f"x_amp: {x_amp}\n"
+          f"y_amp: {y_amp}\n"
+          f"y_mid: {y_mid}\n"
+          f"delay: {delay}")
+    ser = serial.Serial(port=port, baudrate=115200, bytesize=8, parity='N', stopbits=1)
+    ser.write(str.encode(f'{x_amp},{y_amp},{y_mid},{delay}'))
+    print("Sent!\n")
 
 def fitness_mse(measurements):
     """
@@ -133,7 +153,7 @@ def fitness_avg_force(measurements, plot=False, args = {'peak_height':0, 'peak_d
 
     return score
 
-def fitness_avg_thrust_lift(measurements, plot=False, args = {'peak_height':0, 'peak_distance':10}):
+def fitness_avg_biomimic(measurements, plot=False, args = {'peak_height':0, 'peak_distance':10}):
     """
     Interpolates sensor data between the first and last detected peaks and calculates the mean
     of the interpolated 'Fy' and 'Fz' columns to compute a score as the Euclidean norm.
@@ -146,7 +166,9 @@ def fitness_avg_thrust_lift(measurements, plot=False, args = {'peak_height':0, '
     """
     df = measurements.copy()
     interpolated_df, peaks = peak_slice_interpolate(df, args)
-
+    peak_times = df.loc[peaks, 'Time']
+    periods_mean = peak_times.diff().dropna().mean()
+    average_frequencies = 1 / periods_mean
     # interpolated_df now contains 1000 interpolated data points based on the 'Time' column.
 
     Fy, Fz = interpolated_df.mean()[['Fy', 'Fz']]
@@ -183,8 +205,8 @@ def fitness_avg_thrust_lift(measurements, plot=False, args = {'peak_height':0, '
 
         # Display the plot
         plt.show()
-
-    return Fy, Fz
+    return force
+    #return Fy, Fz, force, angle, average_frequencies
 
 
 def twos_complement(value, bits):
