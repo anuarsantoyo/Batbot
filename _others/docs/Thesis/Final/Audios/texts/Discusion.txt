@@ -1,0 +1,45 @@
+In these thesis we tried to demonstrate that using evolutionary algorithms was a viable
+way of finding optimal solutions for controller strategies.
+It had us the idea to test and train robots in the real life scenario as there were many
+situations where robots and dynamic of robots and their environment were so complex that
+simulations were either too slow in order to obtain a lot of repetitions which is normally
+needed with other machine learning algorithms or were just too complex that we just didn't
+allow to have correct representations of the real world.
+This was a great advantage of using the actual robot in order to train it for the given task.
+In these thesis we could clearly show and explain a very detailed description of a system that
+actually worked on developing a robot for training to hover.
+Hovering was from the beginning clearly stated that it was a very complex goal to achieve.
+Nonetheless our plots and our experiments showed that the robot actually made a learning
+attempt into that direction.
+It was also of great use this algorithm because it made us realize that as much as the robot
+could learn to fly that they were still some mechanical and physical limitations that were
+afterwards worked on.
+So even though the end goal of the test case of hovering was not achieved we could clearly
+say that the goal of developing a system that trained robots using the CMA algorithm in
+a successful way was indeed achieved and proved to be functional.
+Nevertheless in order to take advantage of its full potential several experiments must
+be repeated using the latest version of the upgraded BATBOT with its new mechanical and
+electronic abilities.
+Experiments which are unfortunately out of the scope of these master thesis.
+Nevertheless these thesis laid the foundations from which hovering could be someday achieved
+using this new technology.
+Even though the complex task of developing controlling algorithms for hovering BATBOT
+was partially achieved this system and this strategy definitely has important disadvantage
+that must be mentioned.
+First of all the greatest advantage of using the real robot to do repetitive experiments
+to train a machine learning model is the fact that the security and the integrity of the
+robot is compromised.
+Definitely repeatedly testing a robot and exposing it to high stresses damages the robot
+and unless the robot is very robust it would mean as it meant for us the need of constantly
+repairing broken tiles of the robot.
+This is a problem of course that simulations try to solve.
+Nevertheless with the information obtained from the optimization algorithm strategy and
+also the experiments made with the free forward flight incorporating the PID controller are
+of great advantage and leap the project of hovering to a very mature state.
+As mentioned before the scope of the thesis was to demonstrate that there's the possibility
+of doing an optimization algorithm system using CMA to train a robot in which this case
+the hovering of the BATBOT was only the study case from which we can say that an optimization
+algorithm strategy is definitely suitable, efficient and successful.
+With this information future work could focus on repeating experiments and refining optimization
+using the same strategy and the same system developed in these pieces but using the upgraded
+BATBOT to obtain more refined and better results with the now functioning BATBOT.

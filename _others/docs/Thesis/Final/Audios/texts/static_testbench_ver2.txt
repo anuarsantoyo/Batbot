@@ -1,0 +1,13 @@
+On the second version of the static test bench all the metallic structures were
+removed and the load sensors were replaced by a sensor called decent that
+is a six-actual force and torque sensor. This simplified structure has a lot of
+advantages. First of all the bad boat is directly connected to the sensor meaning
+that there are no metallic structures or components connecting the bad boat to
+the sensor which eliminates the problematic of moving parts or stress
+being inputted into the whole structure. Another great advantage of the second
+version of the static test bench is the fact that we are being able to very
+clearly measure not only the forces exerted by the bad box but also the
+moment also known as torque. These sensors are specialized sensors which
+don't have the same mission as the first version in which the torque and the
+thrust multiplied with the distance to the loads would contaminate the data
+from each other in the load sensors.

@@ -1,0 +1,18 @@
+In order to recreate the real environment of the bat flying as close as possible,
+wireless communication between the computer and the bat bot must be achieved.
+I use different modules and strategies to try to achieve this.
+I use the Wi-Fi module ESP8266 and try to connect the computer using a common Wi-Fi router
+to which the bat bot was also connected.
+I try to pass the information of the proposed solutions using GET requests.
+This proved to be very impractical as the ESP8266 was not reliable and would sometimes connect and disconnect.
+The second attempt I did was using the Bluetooth module HC05.
+This also proved to be very impractical as the Bluetooth module would also connect and disconnect constantly
+and would also suffer sometimes from interference.
+Finally, the last module tested which proved to be the best one and the most efficient was a wireless UART module.
+This was very easy to install in the bat bot, was lightweighted, was very reliable.
+It's just a matter of connecting an emitter to the computer where the Python code was rolling.
+The Python code using a serial communication package and a bot rate from 115200
+could very practically and efficiently and quickly send the proposed solution to the bat bot
+which had a receiver connected to its microprocessor that obtained the proposed solution of the CMA algorithm
+which then let it run the proposed solution in the program of the microcontroller of the bat bot.
+The wireless UART proved to be the best solution.

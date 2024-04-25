@@ -1,0 +1,40 @@
+I would like to talk a little bit about the test bench. I made two specific test
+bench. The first one that I'm going to be talking about is the static test bench.
+The idea of the static test bench is to be able to test different configurations,
+different movements of the bad bot and be able to measure the forces it
+exerts. On the first version of the test bench what we did was use six load
+sensors configured in the array showed in figure one and from the six load
+sensors a metallic structure was positioned on top of it where the bad
+bot was connected to. At the connection of the bad bot with the structure there's
+a servomotor that also controls the angle of attack of the bad bot. In the
+version one we can use the information of the load sensors in combination with
+basic mechanical principles to calculate the lift and the drag forces. In the
+following formula we can see the process needed in order to calculate the lift
+and the drag of the of the bad bot as well as the thrust using as an input the
+six different load sensors. Connected to the six load sensors is the data
+decision device called BSQ that is used to obtain the data from the six
+sensors and communicate them to the computer via a USB connection. More
+details of the BSQ would be explained in the further section of the same chapter.
+The version one design of the static test bench had a lot of disadvantages and
+problems. First of all a calibration was needed which proved to be very
+challenging as the moving parts of the structure had an issue because if the
+moving parts of the structure were fixed by tidying the screw very much these
+made that there were internal tensions in the whole structure and what happened
+with this is that the sensors were measured also part of this internal
+tension and when the bad moved or when the structure was changed the calibration
+data needed in order to not to obtain an absolute zero also changed. On the other
+hand if the screws were loose the structure had too much movement which
+also gave back not very good quality data. Also the formula is used in order to
+calculate the thrust and the lift with this configuration of sensors is
+normally used when putting a flying vehicle like an airplane or something
+similar in a wind tunnel. Unfortunately on our case we have a flapping
+vehicle that generates a force compared to the other type of experiments that I
+just mentioned which is only passively calculating the forces that the wind
+exerts on the vehicle. In our case the vehicle itself is propelling and
+generating a force and a torque and with this configuration it was very hard to
+distinguish if the thrust exerted by the bad boat was being correctly measured
+by the load sensors or if a moment accepted by the bad boat was the one
+that was being measured. It was mathematically not possible to decouple
+the information of a moment being accepted or the thrust being exerted on the load
+sensors. For all of these reasons an upgrade to a better static test bench
+was needed.

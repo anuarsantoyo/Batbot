@@ -1,0 +1,23 @@
+Now, I would like to talk about the dynamic test bench.
+The idea and goal of the dynamic test bench is to provide the bat bot an environment that
+replicates the real case scenario in which the bat bot would be trying to achieve hovering
+as close as possible to reality whilst protecting the bat bot from the ground or falling.
+The dynamic test bench consists on the following.
+First we used the six axis force and torque sensor and we attached it to the ceiling.
+From this an elastic string with the elastic modulus of 0.6 is attached and the length
+of 0.6 at the end of the string the bat bot is hanged from the nose, positioning the bat
+bot in a vertical position which is the one needed in order to achieve hovering.
+Given the force measurements of the sensor we can calculate first the direction in which
+the bat bot is at the moment.
+This could be achieved by normalizing the force vector measurement and we can also achieve
+the resulting force that the bat bot is accepting on the sensor.
+This can be calculated by calculating the Euclidean distance of the three dimensional
+force vector that the sensor reads.
+With the direction information and the total force information we can use Hooke's Laws
+that also includes the length of the elastic and its elastic modulus and we can use this
+in order to correctly calculate the position of the bat.
+That way using the dynamic test bench we can not only calculate the force that is being
+pulled on the sensor which means how much is the elastic string actually pulling on
+the bat bot and how much is the action of the flapping exerting an upward force on the
+bat bot but we can also calculate the position of the bat bot the whole time.
+All of this while keeping the bat safe ensuring the possibility of repetitive experimentation.

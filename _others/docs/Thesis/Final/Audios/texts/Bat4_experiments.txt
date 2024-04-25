@@ -1,0 +1,47 @@
+After several handheld experiments and through trial and error, we found the perfect strategy
+in order to induce rotations in the x direction and the y direction and the z direction.
+If you consider the x axis to be perpendicular to the length of the body, the y axis to be
+along the length of the body and the z axis following the right hand rule, if you want
+to rotate through the x axis, all you have to do is either pull both legs up in the vertical
+direction or down.
+In order to achieve a roll movement, which means through the y axis, then all you have
+to do is move one leg up and the counterpart leg down.
+This would make a roll movement and if you decide to do a rotation in the z axis known
+as yaw, all you had to do was to disable one of the legs by positioning it 90 degrees
+with respect to the body and extending the other leg to 0 degrees with respect to the
+body.
+This way you could achieve a rotation in the three axes.
+After these achievements and these findings, the idea is to combine now these new control
+strategies in order to induce rotation movement and combine them with the fit forward algorithm
+found using the optimization process in order to obtain a full feedback controller loop
+that used the fit forward controlling algorithm proposed by our evolutionary algorithm and
+used the knowledge obtained by trial and error to achieve rotations in the three directions
+of the bad bot.
+In order to obtain a feedback loop, what we needed to use now was the MPU accelerometer
+in order to calculate the direction of the ground, which also could be understood as
+the pitch roll and the roll angle of the bad bot, in order to correctly control the position
+of the bad using the before acquired knowledge.
+For this, the integration of the MCU accelerometer and gyroscope was needed into the system in
+order to correctly calculate the position of the ground to respect the bad bot, which
+is also understood as the pitch or roll angle.
+Using the backbone of the PID controller was straightforward and easy thanks to the simplicity
+of the micro python language.
+Nevertheless, when doing tests, the algorithm seemed to have some issues.
+After further research, we realized that the MPU had a lot of disadvantages.
+First of all, as it only gives acceleration data, we at the beginning naively calculated
+the position of the pitch and the roll angle based on the accelerations data from the MPU,
+assuming that the only acceleration that was read was the gravitational acceleration.
+This is true when the bad bot was static, but we could see the strange phenomenon that
+as even though the legs correctly moved when we moved the bad bot up and down, if we were
+to do a quick movement forward, the bad bot would confuse this new acceleration measured
+with the change of angle or a change of the direction of the gravity.
+This meant that the MPU was not able to differentiate between the acceleration that the gravitational
+force exerted on the bad bot and the acceleration measured by the movement of the bad bot.
+After realizing this, we concluded and decided that first of all, we must ensure that a correct
+data acquisition regarding the pitch and the roll angles of the bad bot would be necessary
+before trying to achieve such a complex task as is hovering.
+For these reasons, our next steps from now on focused on forward flying in a stable way
+with the use of the PID algorithms.
+Once this problem was managed in the future works, we could combine the results obtained
+by these thesis and the free flight experiments to an optimal position where hovering might
+be achieved.

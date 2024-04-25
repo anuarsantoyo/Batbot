@@ -1,0 +1,80 @@
+In order to achieve a synchronous movement of the leg with respect to the wing bit, it
+is very important to find out the face of the wing cycle in which the wing finds itself
+at a precise moment.
+The wing flapping cycle consists of an up stroke and a down stroke.
+When the wing is all the way down, we can consider that to be the starting point and
+in order to facilitate us with a notation that can be used in order to control the leg
+movements, we define the starting point of the wing cycle as being zero and then the
+finishing point of the cycle to be 2 pi.
+That means that when the wing is all the way down, it's by the cycle zero, then when
+it goes up and it's at the highest point of the stroke, it's at the cycle pi and when
+it goes down and finishes the cycle, it ends up at 2 pi.
+So in order to calculate this cycle, which we have named the pi cycle (cyc_pi), we need to know
+two things of the wing.
+First, its position, or which is also understood as the angle of the wing with respect to the
+body, this can be calculated using the AS5048 magnetic encoder sensor.
+On the axis of rotation of the wing, we have positioned a magnet that rotates with the
+wing.
+The rotation of the magnet can be calculated using the before mentioned sensor and with
+this we can calculate the angle.
+Another important information that we need in order to find out the exact face of the
+cycle in which the wing finds itself is the direction of the angle, if it's going in
+an up stroke or in a down stroke.
+In order to achieve this, we use the last four measurements of the magnetic encoder
+and we calculate the derivative within each other and at the end we calculate the average
+derivative of the four derivatives calculated with the four last points.
+This is done because there exists noise in the data.
+For this reason, only using the last two measurements is not entirely reliable.
+That's why we decided to use an average.
+So after calculating the average slope of the change of the angle measurements, we can
+determine if the wing movement is on an up stroke or on the down stroke.
+If the derivative calculated it's positive, then we consider it an up stroke and if it's
+negative it's considered an up down stroke.
+So by knowing the precise angle of the wing and if it's on an up stroke and a down stroke,
+we can then calculate or better said map the angle measurements of the wing into the parameter
+P cycle that goes from zero to two pi.
+So how is this achieved?
+First of all, it must be noted that the maximum angle and the minimum angle sometimes have
+different measurements.
+This means that sometimes because of the uncertainties of the mechanical design, because of difference
+in flapping on the forces applied to the wing, the measurement of the AS5048 angle of the
+maximum angle and of the minimum angle is not constant.
+This means that in order to find out exactly in which part of the cycle the wing finds
+itself in, we have to define a maximum angle and a minimum angle.
+And use these two information to normalize the angle.
+So with this process, we can map the angle measurement to a value that goes from zero
+if the angle is at the bottom, the lowest possible, or one if the angle is the highest
+possible.
+As I've mentioned before, the maximum angle and the minimum angle are not constant.
+For this reason, the solution that we decided to use is to measure and save the last hundred
+measurements of the angle and define the maximum angle or the minimum angle to be the maximum
+or minimum of the last 100 measured angles.
+By measuring 100 angles, we can be sure that at least one period of the flapping would be
+within the 100 data points, which ensures that we have achieved either the maximum and
+the minimum.
+And at the same time, if the value of the maximum or minimum angle has changed, we could dynamically
+adapt our calculations of the cycle based on the real time angle measurements.
+So this is what we do first.
+We save the last hundred angle measurements from which we calculate constantly what is
+the minimum angle, the lowest angle possible at the downstroke, the maximum angle, which
+is the highest possible angle at the upstroke.
+And we use these two angles measured by our sensor to normalize the angle measurements
+in a range between 0 and 1.
+So this way, we redefine the position of the wing to be between 0 and 1.
+Using the before mentioned derivative of the angle, we calculate if we are on an upstroke
+or on a downstroke.
+We then use linear interpolation, and we use linear interpolation in two different cases.
+If we are on an upstroke, then the cycle that it's being right now calculated between 0
+and 1 is interpolated to go between 0 and pi.
+In the case that we are on a downstroke, then the linear interpolation looks as follows.
+If our cycle value is 1, meaning the highest angle possible, then we linearly interpolate
+it to pi.
+And if it's 0, the lowest angle possible, then our linear interpolation should give
+us 2 pi.
+In this way, we have converted correctly and taken into consideration the mechanical limitations
+as well as the inaccuracies of the sensors.
+We can correctly calculate, with a lot of precision, in which part of the flapping cycle
+the wing finds itself at the moment in a range from 0, being the beginning, which means the
+lowest part, all the way to 2 pi, which means going up and then down again.
+This will be very useful in the coming experiments when we try to synchronize the movement of
+the legs with the movements of the wings.

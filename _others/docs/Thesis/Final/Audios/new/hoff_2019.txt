@@ -1,0 +1,5 @@
+In the paper trajectory planning for a bat-like flapping wing robot, the scientist Jhonathan
+Hoff, \cite{hoff_2019}, developed a bat dot that is able to follow a design
+trajectory with its onboard electronics.
+They also used a load sensor to obtain force data for parameter selection and computationally
+inexpensive analysis, which can be used efficiently in a nonlinear solver.

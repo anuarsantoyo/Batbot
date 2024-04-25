@@ -205,8 +205,8 @@ def fitness_avg_biomimic(measurements, plot=False, args = {'peak_height':0, 'pea
 
         # Display the plot
         plt.show()
-    return force
-    #return Fy, Fz, force, angle, average_frequencies
+    #return force
+    return Fy, Fz, force, angle, average_frequencies
 
 
 def twos_complement(value, bits):

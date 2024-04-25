@@ -1,0 +1,20 @@
+Using this version of the BATBOT, several experiments were made.
+First of all, we wanted to see the influence the folding and unfolding mechanism had on the lift.
+For this, we did an experiment that we named the grid experiment.
+The idea of the grid experiment was that we would try 10 different attack angle positions
+of the BATBOT as well as 10 different flapping frequencies.
+That would total it 100 experiments.
+So we would do 100 experiments without using the folding and extending mechanism
+and one using the folding and extending mechanism.
+The result of this experiment, as seen in Figure 4,
+can clearly show that when folding and unfolding, a higher resulting lift was achieved.
+Almost in every single experiment seen compared to the experiment where only extended wings were used.
+The only case in which this seems to be the other way around is when the attack angle has higher values,
+which is indeed very logical as the higher the attack angle is.
+In this case, the downstroke and the upstroke both play in favor of generating higher lift,
+which is defined as a force in the vertical positive direction.
+If we use the attack angle 45 at a flapping frequency of 6,
+we can also clearly see in Figure 7 where the green area represents upstroke
+and the white area represents downstroke that the peak lift achieved is more or less the same in both situations.
+But during downstroke, during upstroke, the force generated downwards is definitely much lower,
+which results in a higher resulting lift.

@@ -1,0 +1,39 @@
+Once completing the design, the upgraded design of the bat version number three, several experiments were done.
+First we wanted to see if the resulting force was now enough in order to lift the weight of the bat butt.
+In order to prove this, in this case we used the before mentioned dynamic test bench.
+Thanks to the analysis results of the force experiments, we also realized that the resulting force that had two main directions
+when combined showed a resulting force no swords of the bat butt.
+This made us realize that in order to achieve hovering, the folding and unfolding strategy was not as advantageous.
+Also, at higher frequencies it was hard for the robot to keep up with the folding and unfolding fully of the wings.
+For those reasons and in order to provide as much resulting force as possible,
+we decided to do all of the following experiments only using the extended version of the bat butt.
+For the dynamic test bench experiment, the bat butt was once again hanged from the elastic string
+as explained in the chapter where the test bench was explained and we gradually increased the flapping frequencies.
+When achieving a flapping frequencies of around 6 hertz,
+we could see in the force plot that the force measured by the six axis sensor plummets to zero.
+This is a very clear demonstration that finally our bat butt is able to generate forces high enough in order to pull its own weight into the air.
+This was a great achievement as we were now able to demonstrate that the mechanical design of the current bat butt was enough to actually achieve hovering
+and that from now on all that is needed is the correct controlling strategy.
+Therefore, a set of several hand control experiments was now taken into consideration.
+As a small remark, the electronic part of the bat butt was only changed in which the commands were now received by a radio controller instead of by the UART module,
+which was replaced by a radio controller receiver module.
+So first we did a test where the bat butt attempted hovering by flapping its wings and we could clearly see, as mentioned before,
+that it achieved zero force on the sensor.
+For this reason then we decided to bring the experiment outside where a long string, an elastic string, was connected to the bat butt
+in order to better simulate the real conditions that the bat butt would be exposed to when doing the real experiments in free flight.
+The results of this experiment showed once again that the force exerted by the bat butt was actually enough to pull him off of his own weight
+and also showed an incredibly stable flight as the bat butt, even though it was still connected to the elastic string,
+didn't show erratic motions and could be clearly seen that had a very stable type of flight.
+For this reason, the next step was to gain a better understanding of which leg movements influenced the rotation of the bat butt in the three rotational axes.
+This is of most importance as if the goal is to control a hovering bat butt, the moment the bat butt appears to tilt or go away from its neutral position,
+some type of adjustment must be done in order to correct its position again to the position in which it maintains its hovering position.
+So several tests were done regarding the correct movement of the legs in order to achieve the desired rotation of the three axes.
+There were just inducing certain angles on the legs, there were also activation and deactivation of the left or the right wings using the legs to do that.
+And the results showed very promising results as the bat butt would actually more or less rotate on the desired directions.
+Nevertheless, we realized that the legs were too short in order to actually induce any type of force.
+For this reason, correct scaling of real bats was used in the future.
+Once the basic idea was achieved, several free flight experiments using a net as protection for the bat butt were tried.
+Unfortunately, the experiments were not entirely successful, even though the bat butt was able to stay more or less statically for a couple seconds,
+the fact that there was no integrated feedback loop at this moment couldn't allow the bat butt to keep its position in the air.
+For this reason, we realized that some improvements must have still be done in the legs and also that it has arrived the moment in which the PID algorithm must be included in the bat butt.
+Thus, the mechanical design has already achieved its maturity.

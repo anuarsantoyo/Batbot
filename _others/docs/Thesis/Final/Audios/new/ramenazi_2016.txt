@@ -1,0 +1,5 @@
+In the paper, Badbot B2, a biologically inspired flying machine from Ramanazi,
+site Ramezani, underscored 2016.
+The badbot developed by Ramanazi and their team on 2015
+was put into a test when a PD controller was used
+in order to control the tail mechanism to achieve a sustained flight.

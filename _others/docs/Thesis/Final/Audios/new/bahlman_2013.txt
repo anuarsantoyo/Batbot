@@ -1,0 +1,7 @@
+In the paper Designing Characterization of a Multiarticulated Robotic Bat Wing, written
+by Joseph Vollmann, site Vollmann underscore 2013, the scientists developed a replica of
+a robotic wing of a bat, specifically the fruit bat, which they use in order to analyze
+dynamics in kinematics as well as inputs given to the wing compared to the output that was
+measured on a test bench.
+They used a very smart design that controlled the joints and the limbs of the bat using
+strings which made the wing to be light, flexible and controllable.

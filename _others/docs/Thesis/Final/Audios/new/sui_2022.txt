@@ -1,0 +1,6 @@
+In the paper, Optimum design of a novel bio-inspired bat robot by Tingting Sui, site Sui underscore
+2022.
+The scientists used PCAN optimization algorithms in order to design a new structure of the
+wing of a bat by trying to approach the movement of the limbs of the real bat and the data
+that they had from the movement of the real bat to simulate as close as possible the movement
+of a simulated version of the robot bat's wing.

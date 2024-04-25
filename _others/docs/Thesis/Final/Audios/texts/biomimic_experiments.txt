@@ -1,0 +1,96 @@
+Experiment 1:
+
+In this experiment we tried to recreate the movement of the real bat.
+We had an issue that was that the data given by the bat regarding the amplitude of the hind leg movement was given in millimeters
+and the bat bot actually works in angles.
+So using the data of the bat and trigonometry we had to first define the movement of the hind legs in angles.
+So for this we did the following.
+We knew that the lateral amplitude was of 16 millimeters and that the vertical amplitude was of 10.5 millimeters.
+As we already knew that the length of the leg was of 40 millimeters,
+we could use basic trigonometry to calculate these in terms of angles by doing this following.
+If you consider the leg to be the hypotenuse and the lateral and vertical movement of the hind leg to be the opposite side of the triangle,
+then we could actually calculate the amplitude of the leg with arc sign of the amplitude divided by the length of the leg,
+which gave 23.5 degrees in the case of the lateral amplitude and it gave around 15 degrees in the y amplitude.
+In our specific case in this experiment it meant that during the upstroke the legs would open at a degree of 47 degrees,
+which is the double as the amplitude calculated,
+and then during the downstroke they would come back to their origin position at zero degrees,
+whereas the movement in the y direction follows the movement of the wing bit,
+so the hind legs and the wing bit are actually synchronous movement,
+and the going up and down of the legs are going up by the amplitude that was before calculated with was 15 degrees upward
+with respect to the origin position, which is zero degrees.
+
+
+Experiment 2:
+
+In the second experiment we wanted to know the influence the movement of the hind legs have.
+In order to see this we did the following experiment.
+We decided to leave the legs completely statically and just enable the folding and unfolding function of the bat.
+This could give us a better understanding of what actual role or influence does the hind leg movement have on the results.
+The first experiment showed to have a force of 0.96 newtons at an angle of 23.51 degrees and a frequency of 1.4 hertz.
+The experiment number two showed a force of 0.9 newtons at an angle of 22.22 with a frequency of 0.33 hertz.
+
+
+Experiment 3:
+
+On the third experiment we wanted to understand now that we've seen the results by not moving behind legs,
+we also wanted to see the influence the folding and the unfolding had on the results.
+That's why on the third experiment we had stretched legs so there was no leg movement whatsoever
+and also no folding and unfolding of the wings. The wings were completely extended throughout the third experiment.
+This gave us a result of 0.89 newtons at an angle of 22.32 degrees and a frequency of 1.7.
+
+
+Experiment 4:
+
+So experiment number four consisted on testing the influence the lateral amplitude has on the bat but.
+So it was more or less a recreation of the first experiment in the meaning that we are again enabling folding and unfolding
+and also enabling the movement in Y and X direction. The amplitude and the movement of Y direction is still synchronous
+when the wing bit and it is still of an amplitude of 15. The thing that we did different on experiment number four
+is that we actually did 10 sets of tests that use a different lateral amplitude for the test.
+So the values that we tested were ranging from 0 to 90 degrees.
+So there were 10 experiments that went from 0 to 90 degrees.
+In the following table you can find the resulting force, angle and frequency with respect to the X amplitude that was tested.
+
+
+Experiment 5:
+
+On experiment number five we once again inspired by experiment number two, the bat mimicking experiment
+we set the X amplitude to be again of 47 and the Y amplitude to be of 15
+and what we varied this time also in 10 different tests was the delay.
+In this experiment we are trying to understand what happens to the forces when the upstroke and downstroke of the hind legs
+is not synchronous with the upstroke and downstroke of the wing bit.
+In order to test this we defined the variable delay which can have values from 0 to 2 pi
+which represent the phase shift the bat boat has of the hind legs with respect to the wing bits.
+We understood that any value of delay between 0 and pi is understood as a delay
+of as a lagging behind of the hind legs with respect to the wing bits
+and because of the cyclical nature of this parametrization
+any value of delay that goes from pi to 2 pi could be understood as an ahead movement of the hind legs before the wing bit.
+This is what we wanted to test in this set of experiments.
+In the following table you can see the frequency, force and angle with respect to the delay that was tested in each test.
+
+
+Experiment 6:
+
+And the experiment number six, the lax experiment, is the optimization experiment.
+As I mentioned before the technology developed in this master thesis that includes the application of evolutionary algorithms
+to find optimal controlling strategies of not only bat boats but could be applied to any other type of robots
+is of a lot of advantage especially for situations like the one we find now.
+So in this experiment we try to see if the evolutionary algorithm strategy is able to find an optimal set of parameters
+that increase the force as much as possible.
+So in this example we're trying to optimize four different parameters.
+First the X amplitude which is the angle that the leg moves while it's having its upstroke movement of the hind leg flapping
+and this can range between 0 and 90 degrees, that's the first parameter.
+The second parameter is the Y amplitude which can range between 0 and 60 degrees.
+The third parameter is the Y neutral position.
+This is the angle from which during the upstroke and downstroke of the hind leg flapping the amplitude starts to be counted.
+So for example if my Y neutral angle is 30 and my amplitude is of 15
+then I'll be having a frequency that oscillates between 45 and 15 degrees
+because my angle is 40 and my amplitude is 15.
+And the last parameter that we're trying to optimize is the delay of the hind leg flapping with respect to the wings flapping.
+This can have values from 0 to 2 pi.
+The score function for this optimization algorithm using the evolutionary algorithm strategy in this case is simply the resulting force.
+There's a small thing though, we're trying to maximize the force as much as possible
+and by default the evolutionary algorithm tries to find optimal solutions that minimize the score function as much as possible.
+For this reason the score function is actually defined as the negative of the resulting force
+which means that as the resulting force grows higher our score function becomes more negative
+and our evolutionary algorithm would try to minimize this function as much as possible
+meaning that it would try to do as negative as possible that means that the resulting force would be as large as possible.

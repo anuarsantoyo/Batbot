@@ -1,0 +1,10 @@
+Using the result of the experiments of the Bad Bot version 3, now the Bad Bot version 4 was developed.
+The main mechanical difference with regard to the Bad Bot version 3 and Bad Bot version 4 are as follows.
+First of all, the legs were now constructed to the scale of the real fruit bat,
+which meant that the legs were now much longer, which will provide the ability of producing more torque
+by quick and rapid movements of the legs, which will then allow the Bad Bot to do rotations in the air.
+On the electronic part, which is also in this case will be influencing the mechanical part,
+we incorporated an embedded system that helped us eliminate the need of the PCA module
+and combined a lot of the components within only the embedded system.
+This was very useful as it first of all reduced drastically the weight of the Bad Bot by 75 grams
+and also made the structures much easier to handle as less wires were needed.

@@ -1,0 +1,10 @@
+In this chapter I will be talking about the methodology used in these master
+thesis. I will explain a little bit about the test benches that I used, the
+static and the dynamic one, how they're built, their usage and I am also going to
+make a very deep explanation of the optimization algorithm that I developed
+and implemented in these pieces. The exact description of the bad bot, its
+components, the mechanical design and so forth, changed it throughout the master
+thesis. Several experiments gave light to different discoveries which allowed us
+to improve the design of the bad bot. For this reason the bad bot
+information won't be included in the methodology chapter as in the coming
+chapters for each version there will be a detailed explanation.

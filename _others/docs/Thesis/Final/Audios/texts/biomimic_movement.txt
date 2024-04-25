@@ -1,0 +1,48 @@
+I have a robot that has flapping wings. The cycle of the wind beat going from down
+into the up stroke to the maximum angle and then down to the down stroke to
+reach the lowest point again is defined as a parameter cyc_pi that goes from
+zero to two pi. On my code I have a variable called delay which is intended
+to be used to generate a delay in the flapping cycle of the hind legs. The idea
+is that the wing beat cycle and the leg flapping cycle have a phase shift that I
+can control. For this reason I've written a function called is_leg_upward(cyc_pi, range_start) in order to know if the leg should be
+moving upward or not. I can use this information to change the angle on the
+x direction of the legs. If the legs should be going upward then the legs
+should increase their angle and if not they should decrease it. The y angle of
+the leg is simply calculated as a neutral position of y minus the amplitude
+times the cosine of the before mentioned pi_cyc plus this delay. This delay
+works as a phase shift. At the end I move all the motors with the function move(). 
+Here is the mentioned code:
+ 
+def is_leg_upward(cyc_pi, range_start):
+	"""
+	Check if cyc_pi is within a cyclic range of width pi,
+	starting from range_start, considering the circular nature of angles.
+
+	:param cyc_pi: The angle in radians, normalized to [0, 2*pi).
+	:param range_start: The start of the range, normalized to [0, 2*pi).
+	:return: True if cyc_pi is within the range, False otherwise.
+	"""
+
+	range_start = range_start % (2 * math.pi)
+
+	# Calculate the end of the range
+	range_end = (range_start + math.pi) % (2 * math.pi)
+
+	# Determine if cyc_pi is within the range
+	if range_start < range_end:
+	return range_start <= cyc_pi < range_end
+	else:
+	# The range wraps around, so cyc_pi is within the range if it's
+	# either greater than the start or less than the end.
+	return cyc_pi >= range_start or cyc_pi < range_end
+        
+ 
+leg_upward = is_leg_upward(cyc_pi, delay)
+x_theta = x_amp if leg_upward else 0
+fold = folded if upward else extended
+y_theta = y_mid - y_amp*math.cos(cyc_pi + delay)
+move(motor, x_theta, y_theta, fold)
+
+I would like you to please explain all of what I've just said in a master thesis
+format and also give the result back in a latex code with correct mathematical
+representations.

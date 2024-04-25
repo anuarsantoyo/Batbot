@@ -1,0 +1,93 @@
+As mentioned before
+We have already parametrized the movement of the high legs of the Batbot to be an ellipse
+Now I would like to explain
+how the
+Wing cycle measurement will be used in order to
+Synchronously control the hind leg movements. I
+Will start by defining not only the hind leg movements, but also
+The command to fold or extend the wings
+This is quite straightforward
+If we find ourselves in the upstroke movement
+Then the wings should be folded in order to reduce air resistance
+If we detect a downward movement
+Then the wings should be extended
+Next I will explain
+the movement of the
+Leg in the vertical direction with respect to the wing cycle as a reminder the wing
+Cycle (cyc_pi) goes from 0 to 2p being 0 the
+lowest point and
+Starting all the way to the upward
+Which would mean that it goes from 0 to pi in the terms of the wing cycle and then
+from pi to 2pi
+During the down stroke
+With this measurement
+The angle
+Of the vertical movement of the hind leg will be calculated as follow
+First
+Using this formula the y-angle is equal to the
+Neutral state of the y-angle
+Minus
+The y-amplitude
+Multiplied by the cosine of
+The
+cyc_pi
+What we do with this formula is first state the neutral state of the
+Leg which means the neutral angle and then by multiplying the
+amplitude
+with the cosine of
+The cyc_pi
+What we do is oscillate
+between
+Minus one and one which is multiplied by the amplitude
+So the amplitude depending on the cycle in which we are finding ourselves of the wind bit
+Would be either
+Multiplied times one or times minus one
+Which will make the leg go
+Up and down
+Synchronously to the movement of the
+Wing
+Now with respect of the lateral movement
+The lateral movement is accomplished in a very similar way though. It has a very important
+Difference
+Similar to the y-movement the x-angle is calculated as being equal to
+the x-neutral angle
+Plus
+the x-amplitude
+times
+The sinus of (and here comes a different part)
+my cyc_pi
+plus
+two times pi
+multiplied by
+the
+parameter
+ellipse angle
+this last term
+Two times pi times ellipse angle
+Creates a delay within the sine function
+Let's remember that the ellipse angle has values that range between zero and one
+So when multiplied by two pi
+We get values that go from zero to two pi
+Which is actually all that we're achieving is a shift a phase shift of
+the x
+movement with respect to the
+Y movement
+If there were no shift involved we would only see a circle
+but as we added this
+term within
+the sine function we create a shift and
+as the
+Amplitudes and middle points have been already determined what this shift enables us to do is to change the form of
+The ellipse
+It can make it
+thinner
+wider or it could even
+change the direction of the rotation
+To clockwise or counterclockwise
+This way we can calculate the exact position the leg should have
+Using as a reference
+The point on the wing beat cycle that the wings find themselves in.
+
+I would like you to please explain all of what I've just said in a master thesis
+format and also give the result back in a latex code with correct mathematical
+representations.

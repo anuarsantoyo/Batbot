@@ -1,0 +1,21 @@
+The CMA algorithm used in this project is initialized and used as follow.
+A so-called solution proposed by the CMA algorithm consists of a five-dimensional vector
+whose elements can only have values between 0 and 1.
+This was done in order to simplify the coding process.
+The values from 0 and 1 are there then later on converted to the actual needed values
+or the values that actually represent movements and specific angles of the servo motors or the flapping speed.
+The five dimensions will be now explained.
+Thanks to the research of Dr. Sudip that obtained data from BAT,
+we know that the movement of the hind legs of the bat is of crucial importance when controlling the flight of the bat.
+And we can also see that the movement of the hind legs follows something very similar to an ellipse.
+So, in these thesis, the solution, this five-dimensional vector, is understood as the parametrization of the movement of the hind legs in an elliptical shape.
+So, one dimension describes the width of the ellipse.
+The other dimension describes the height of the ellipse.
+Another dimension describes the middle point of the ellipse on the horizontal axis.
+Another dimension describes the middle point of the ellipse on the vertical axis.
+And the last dimension describes the orientation of the ellipse.
+As we can have, for example, a thin ellipse, which is very long,
+but it's rotated or inclinated 35 degrees with respect to the horizontal axis.
+So, using these five parameters, we can describe every single possible movement in an elliptical form of the hind leg.
+It must also be mentioned that with the inclination parameter, also the direction of the rotation can be controlled.
+With this knowledge, the CMA algorithm can be initialized, setting the covariance matrix at the middle point of 0.5 in every dimension with a sigma of 0.5 for their normal distributions.

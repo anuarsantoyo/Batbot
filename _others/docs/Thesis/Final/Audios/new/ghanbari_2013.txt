@@ -1,0 +1,6 @@
+In the paper, a new model of bio-inspired bat robot, written by Ganavari Ahmad, site
+Ganavari underscore 2013, a new model of a flying bat was introduced.
+They were able to recreate a flight in a straight path.
+Using a robot that imitates the species called Teroptus polyosephalu, each of the wing has
+four degrees of freedom using a four bar mechanism.
+After the application of control algorithms, they reach their desired flight characteristics.

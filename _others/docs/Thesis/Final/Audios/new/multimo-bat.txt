@@ -1,0 +1,5 @@
+In the paper, Multimobat, a biologically inspired integrated jumping gliding robot
+written by Matthew A. Woodward, site Multimobat.
+The scientist imitated the jumping and gliding locomotion strategy of vampire bats.
+This intelligent robot recreates the jumping movement to gain altitude
+and then enters in gliding mode, similar to what vampires bats actually do.

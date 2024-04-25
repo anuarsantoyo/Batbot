@@ -1,0 +1,24 @@
+Now I would like to explain a little bit more the general workflow of the optimization algorithm
+and its application to find the optimal controlling strategy for hovering in the bad bot.
+The general idea is as follows.
+On a computer there's a Python script running.
+This Python script includes the covariance metrics adaptation algorithm,
+which proposes ten different solutions.
+What a solution exactly means would be explained following chapters.
+Each of these proposed solutions is wirelessly sent to the bad bot to try out.
+The bad bot effectuates these different solutions, starting for example with the solution number one.
+It tests the proposed solution by the Python script, the CMA algorithm,
+and while the bad bot is testing out the proposed solution, the sensor is obtaining the force data of the bad bot.
+The idea being that if the bad bot achieves to reduce the force data as close as zero as possible,
+that would theoretically mean that the bad bot is virtually achieving hovering.
+After this, the data from the sensor is sent back to the Python script,
+and in the Python script there is a data processing step,
+which assures that the sensor data is obtained, cleaned, processed,
+and then from the data the forces relevant to hovering are calculated,
+and from these forces a score could be assigned to the before mentioned test.
+This way, after each experiment has been conducted and its score has been calculated,
+this information is fed back to the CMA algorithm,
+which uses this information to optimize itself and propose a new generation with ten different solutions,
+which should be bringing the general score closer to minimum.
+And this way, our bad bot slowly learns which movements of his legs achieve a lower score,
+which in de facto means that the bad bot is learning how to hover.

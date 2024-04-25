@@ -1,0 +1,22 @@
+In order to obtain information from the sensors and be able to efficiently communicate large amounts of data to the computer, data acquisition systems were needed.
+We encountered a big problem while trying to connect the data acquisition systems to the computer, hence the Python script.
+Most of the data acquisition systems are sold with an integrated software, with the idea of installing and downloading the software into the computer,
+connecting the data acquisition system and that would provide a very easy user interface.
+Nevertheless, we had the problematic that we wanted to automatically obtain sensor information from the data acquisition systems directly into the running Python script
+so that we could automatically and repeatedly process information obtained, doing several experiments within the run of only one Python script.
+This meant that we needed to find a way to automatically obtain and process the data from within the Python script.
+This proved to be very challenging as knowledge of very low level programming was needed.
+Both data acquisition systems used for the two before mentioned sensors communicated on a BODMUS protocol using a package from Python
+and using serial communication and utilizing the correct registers found on the user manual of the set sensors and data acquisition systems.
+We were able to communicate on a bit and byte level with the data acquisition systems.
+The version one of the static test bench which used the load sensors used the data acquisition system called BSQ-HNP9.
+This data acquisition system proved to have some non-optimal values.
+Even though we couldn't obtain data with a hundred hertz of frequency or even more,
+unfortunately, even though the data acquisition system provided a hundred data points of data, most of the data points provided were the exact same value.
+In reality, we were only able to obtain approximately ten unique value data per second.
+So we had a real data login frequency of ten hertz.
+For this reason, the data obtained with this data acquisition system was not very useful as it showed mostly very high jumps from one point of the data to another
+instead of a nice continuous function of forces and data as seen in figure two.
+For this reason, the upgrade to the new sensor of six axes was also a very good idea.
+Because with this sensor and the data acquisition system that it provided, values up to 100 hertz of data with real data were obtained as you can see in figure three,
+which allowed us to have much more precise and much more reliable force data.

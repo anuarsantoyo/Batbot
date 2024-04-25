@@ -1,0 +1,10 @@
+In conclusion, in these thesis we were able to develop a optimization algorithm strategy
+using several test bench and the CMA algorithm in order to try to find an optimal solution
+for the hovering of a bad bot.
+The results definitely proved to be promising throughout the way the optimization algorithms
+brought to the light deficiencies that the bad bot had that were step by step improved
+and upgraded into the best possible version so far.
+From here on, the future researchers could use the system not only to train bad bots
+in this case, but to achieve many different types of tasks, which is the wonders of the
+CMA algorithm that as long as you could relate an experiment to a score, it can be used
+to optimize a system.

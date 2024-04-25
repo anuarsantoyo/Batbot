@@ -1,0 +1,42 @@
+Within all the obtained before we came to the final version of the BATBOT in the
+scope of these thesis. The BATBOT version 5. Mechanically there was no upgrade made
+to the BATBOT but we used a new invaded circuit that replaced the MPU
+accelerometer and gyroscope sensor with an MIU sensor. This MIU sensor proved to
+be of most help. It had great advantages. First of all it didn't only
+calculated acceleration and gyroscopes as did the MPU but also calculated the
+magnetic direction of the earth, the height and temperature and embedded in the
+sensor there is the usage of the Cayley algorithm. This incredible algorithm
+combines all of the sensor data to provide to very reliable pitch and roll
+angle and this pitch and roll angle thanks to the Cayley algorithm can be
+trusted even though the BATBOT is in motion and experimenting accelerations
+due to its movement. So now in order to ensure that we can develop a reliable
+feedback controller that then would be implemented to the hovering algorithm we
+develop the following PID controller for forward flight. So the PID controller
+developed for these experiments were as follows. We're actually using two
+different PID controllers. One PID controller controls the pitch of the
+BATBOT and the other PID controller controls the roll of the BATBOT. The
+BATBOT is initialized to have a position in the neutral state which is zero
+degrees. Then using a control remote you can actually change the neutral
+position of the legs adding or decreasing angles regarding to the neutral
+position of the legs. If you want to control the roll then you could also
+add and decrease angles but with different signs to each leg. As a simple
+example if you want to roll to the right then you could increase the angle of the
+left leg and decrease the angle of the right leg which would at the end achieve
+a rolling motion to the right of the BATBOT. So with a control remote you
+could calculate the neutral state of the leg of the BATBOT and on top of that the
+PID controller would add or subtract angles to that given command from the
+radio control. Several tests were made in which the K values of the PID
+controllers were calculated. First of all in the controller you could
+incorporate a lever that increased or decreased the K values. So the first step
+was finding the correct values for the P gain of the PID controller. So several
+experiments were made. First an experiment was made in order to assure that the
+BATBOT was able to fly. Once this was achieved then flight tests in open
+areas were then conducted where the BATBOT had more time for us to realize the
+dynamic of the real BATBOT in the air and slowly you could twitch and calibrate
+using the control remote the correct K values for the P gains of the roll PID
+and the pitch BATBOT. Once this was achieved then the oscillation was
+addressed now by calibrating the D value. Once that was achieved then the I value
+was calculated in the same way. With these successful results we could actually prove
+that as the mechanical part of the BATBOT as well as the electronical part meaning
+the sensors motors and so on was now ready to fly using a functional feedback
+controller loop.

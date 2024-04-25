@@ -1,0 +1,93 @@
+So in this next section I am going to analyze and explain a little bit the results and the
+comparison of the results within the different tests.
+So we start with the experiment one, the Synchronous Bat Mimic Motion.
+It has a good value, we can clearly see as well that the thrust is much higher than the
+lift generated.
+We have a thrust value of 0.88 and a lift value of 0.38, so it's clearly thrust is
+playing a larger role on the force generation and we have a force of 0,96.
+This value can be used as a reference point when comparing the rest of the experiments.
+So we can go to experiment number two where the legs are stretched.
+This is very interesting because we can see here that the hind leg motion is definitely
+very important.
+We not only have a lower thrust value but also a lower lift value and of course because
+of consequence we have as well a lower force at the end of 0.89.
+This shows that the motion of the legs are definitely important when generating lift
+and thrust.
+Even though by stretch legs the membrane was the most stretched the whole time and one
+could not believe or assume that that would generate more force.
+We can very clearly see here that that is not the case.
+If we now compare the third experiments using the leg stretch and also no folding and unfolding
+in order to see the influence that folding has, we can see that the values are actually
+very similar to the ones of the experiment two.
+Of course as we expected the thrust is lower and the lift is lower as well and the general
+force is as well lower but it is not so different from our results in experiment one than our
+results on experiment two.
+So the results of the experiment three are much similar to the results of experiment
+two than the ones to experiment one which is very interesting because we would have
+assumed that the folding and unfolding mechanism was also very important with regard of generating
+lift and force and what we can see here is that even though it definitely has an influence
+it is not as big as the hind leg movement of the bad butt.
+So we can analyze the results of the experiment number four now.
+On the experiment number four we can see that the results regarding lift were a little bit
+various but constantly the increasing of the X amplitude showed to provide higher thrust
+to the bad butt when compared to our reference point of experiment number one.
+An interesting thing to see as well is that with increasing angles also our resulting
+force increases being the largest force of one Newton achieved by when the angle of the
+amplitude of the X lateral motion was equal to 90 degrees the maximum tested but even
+though there is a clear sign that with higher angles we are achieving higher forces what
+is also interesting to see is that the difference in the forces within these experiments don't
+change as much.
+We can conclude that the simple action of opening and closing the legs are already of
+great advantage especially when we compare these results to the low values achieved in
+experiment two when the legs were just stretched.
+We come now to the results of experiment number five.
+Experiments number five which were the changing delay in ten different points ranging from
+zero to two pi at a constant distance from each other.
+We can see that the resulting forces had the largest variance of all the results that we
+have within this set of experiments we had the worst experiments possible with very low
+lift and very low thrust values but also we can see the best performing results with
+very high thrust much higher than with the experiments from experiments number four.
+This clearly states that the delay or the phase shift between the flapping of the hind legs
+and the wing flapping plays a very important role in force generation.
+Another very interesting thing that we can see in the results of the experiment number
+five is that when the phase shift lies between zero and pi which as explained before means
+that the hind leg flapping is delayed to the wing flapping we see our worst results constantly.
+All of the results that are between zero and pi have worst performances than our reference
+experiment and all of the experiments that were taken with a value between p and two
+pi which can be understood as the hind legs flapping moving ahead with respect to the
+wing beats cycle show to have better performances than their other five counterparting experiments
+and within these experiments we can find the largest forces and the best performing experiments.
+In this case contrary to what we saw in experiment number four there is a spot where the value
+increases of the force that we can see by experiment number eight but when we achieve
+experiment number nine the value of the force starts decreasing as well so there is not
+a direct relationship between a higher delay and a higher force something that we can see
+with the angles of experiment number four. In order to gain a better understanding of
+the results we were seeing in the experiments that were done we thought to create a correlation
+matrix in order to try to see if there are some results that stronger correlate with
+the force that we're trying to maximize and we found very interesting.
+insights first of all we can clearly see that the thrust has a 0.97 correlation with the force
+which makes sense because as explained before most of the force is thrust in our experiments
+and lift has a very slow correlation of course these are not as relevant as other data because
+it is clear and obvious then thrust and lift are related to force as force is simply
+the Euclidean distance between the thrust and the lift. As we can see the angle has a
+minus 0.49 correlation which doesn't
+show of much interest. Nevertheless we could see a very high correlation of 0.82 in frequency
+which was a very interesting as it was not expected and this could give insight to better
+understanding why the results behave the way they did. So for this reason we decided to
+do a deeper analysis in the frequency
+of the experiments with respect to the force they generated.
+Once we plot the frequency value against the force value we could very clearly see
+that there is a very clear collinearity. This is very interesting because
+as mentioned at the beginning of this section all the experiments were done using
+the same voltage 11.6 and the same DC motor command. This means that the power that was
+being applied to the DC motor for the flapping was in every single scenario the exact same.
+So where does the frequency value difference come from and it comes from the fact that the legs
+are moving and depending on the angle of the leg there is either more resistance against the wind
+or less resistance. So what we can see is the result is that apparently at the experiments
+that were being done the most important aspect in order to generate high forces is not necessarily
+a specific movement that generates forces but a movement that reduces the wind resistivity of
+the wing which allows the bat to achieve higher frequencies with the same input power. This is
+very interesting because with this we can show that one of the most important roles of the
+hind leg movement is also the reduction of the area of the wing in order to reduce
+the wind resistance. At the experiments done we can see that this high correlation points to the fact that
+the primary aspect in order to achieve higher forces is to be able to achieve higher frequencies.

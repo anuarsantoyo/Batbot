@@ -1,0 +1,12 @@
+The first version of the bat bot was given to me as Dr. Lee had created it.
+It used one crane and it had two long legs. Each leg was controlled only by one servomotor,
+which meant that we could only control the angle in the vertical direction.
+Also, there was a membrane connecting both of the legs, as well as no folding and unfolding functionality.
+The controlling system was very simple as it only was controlled using a radio control
+and a receiver that directly controlled the flapping frequency and both of the legs.
+This had the advantage of making the bat bot electronic materials very light.
+We conducted several experiments in which we were able to obtain a stable flight in the forward direction.
+This was very promising but had the issue that without being able to create rotational movements of the legs
+controlling and hovering would be very complicated.
+Nevertheless, we could prove that forward flight with this mechanical design could be achieved
+and that the membrane wings, when flapped around 4 Hz, generated enough lift to sustain the bat bot in the air.

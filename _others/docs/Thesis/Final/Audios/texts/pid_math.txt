@@ -1,0 +1,31 @@
+Right now I would like to explain how the PID algorithm is used in order to control the hind leg of the bat,
+depending on the measurements of the IMU sensor which give us back very accurate measurements of pitch and roll angles
+thanks to the Kalman filter which is integrated within the sensor.
+First of all it must be mentioned that two different PID controllers are used.
+One specifically for pitch controlling and a second one specifically for roll controlling.
+First of all the PID controllers are initialized as follows.
+The pitch PID controller is initialized to have a kp gain of minus 0.75 and a ki and kd equal to 0.
+The rolled PID is initialized to have a kp value of minus 1.5 and a ki and kd of 0.
+So first of all the neutral state of pitch and the neutral state of roll are obtained by the robot from the radio controller command.
+We've linked the radio controller to be able to manipulate the neutral state of pitch and roll within the bat.
+Then depending on the measurements of pitch and roll angles these two values are fed to the respective PID controllers which give us back a command
+which is then added to the predetermined neutral pitch and neutral roll.
+This would mean that our new pitch and roll calculated are equal to the neutral pitch or roll plus the compensation calculated by the PID controllers.
+These measurements are only used to control the y angle which means the vertical angle of the bat.
+So once we have calculated the new pitch and their new roll values all that is left to do is command them to the servo motors of the legs.
+How is this done? It is done as followed.
+First the pitch value that we obtained is considered to be the theta angle that we're looking for in the y direction.
+And the roll value that we calculated is simply added to the right leg servo and subtracted from the left leg servo.
+This would make the bat turn in the case that the roll value is different to zero.
+As an example if the white theta calculated after implementing the PID controller is equal to 40 and the roll value is equal to 10
+that would mean that the right leg would have the value of 50 and the left leg would have the value of 30.
+The difference in these values would make the robot turn.
+If the roll is equal to zero then the theta value is simply equal to the pitch value calculated.
+And the higher the pitch value is in this case y theta that would mean that the legs would go up excepting a moment or torque that would make the nose of the bat go up.
+The other way around if y theta makes the legs of the bat go down then the nose of the bat would also go down.
+And it is a combination of the positions of the leg with respect to the body and the difference of one leg to another that generate the torques necessary in order to achieve a stable flight with correcting capabilities.
+
+
+I would like you to please explain all of what I've just said in a master thesis
+format and also give the result back in a latex code with correct mathematical
+representations.

@@ -1,0 +1,17 @@
+Using the badbot version 3, which enabled higher flapping frequencies thanks to the newly installed 2-gear systems,
+we mounted the badbot on the dynamic test bench.
+We did so by tying its nose from the elastic string of the before explained dynamic test bench,
+and let it hang from the 6-axis sensor.
+Then, we activated the flapping motion of the badbot all the way to the flapping frequency of 4 Hz.
+On figure 5, we can clearly see that at the beginning, the force in Z direction is equal to the weight of the badbot.
+But as the experiment is taken, we can see that this value quickly decreases and approaches to zero.
+This means that at the end of the experiment, for a brief second, the sensor could not perceive
+any force being exerted on the string.
+This means that the changes made in the badbot were beneficial to its lift generation.
+And this means that the lift the badbot is able to generate in a static environment is enough to pull its own weight up.
+This means that the badbot now has the mechanical capabilities to exert enough force in order to achieve hovering.
+As mentioned in the chapter where the test bench was described, using Hawke's laws and the normalization of the force in order to get the direction of the badbot
+and the magnitude of the force to calculate the displacement of the elastic string, we can calculate the motion of the badbot.
+In figure 6, we can clearly see that even though the badbot has enough force to lift itself up, there's still work to be done in order to achieve stable hovering flight.
+Nevertheless, finally achieving enough force to lift the badbot without the need of an airfoil going around the wing that also influences and provides the bad with extra lift
+is of great advantage because now we can prove that the badbot is able to hover and to stay in the air without the need of it moving forwards to use the airfoil as an extra lift source.

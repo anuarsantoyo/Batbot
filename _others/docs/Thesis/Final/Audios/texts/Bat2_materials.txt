@@ -1,0 +1,54 @@
+In order to be able to try to make controlling for hovering possible some changes were done
+to the bad button version number one which brought us to version number two.
+The main mechanical changes were that at each leg instead of only using one servo motor
+two servo motors were now being used which meant that each leg had the freedom of moving
+not only on the horizontal but also in the vertical axis whereas before only the vertical
+axis was possible to move into.
+In order to remove the legs on the horizontal direction the membrane had to be split on
+the legs to allow for individual movement as the version before had a connected membrane
+which would link the horizontal movement of the two legs.
+Another important advantage and change made was that we used a magnetic encoder sensor
+on one axis of the shoulder of the wing of the butt.
+This would enable us to measure the angle in which the wing currently is.
+This is of utmost importance as the movement of the leg must be coordinated with the wing
+angle.
+Those were the main mechanical advancements.
+Also a servo motor was installed which allowed the butt to extend and fold its wings.
+The wings extended represent around 13 square centimeters and when the wings were fully
+folded the area of the wing reduced for around 20 percent.
+This has the great advantage to reduce the drag of the wing while upstroke.
+With this using the magnetic encoder and the difference of the angle we could also calculate
+the direction in which the wing was moving which is called upstroke or downstroke and
+with this information and the ability to fold and extend the butt-pot wings we could extend
+the wings while down stroking and fold them while up stroking which meant that in the
+resulting lift there would be more lift generated as the folded wings generated less drag while
+up stroking.
+On the electronic side of the butt-pot there were several experiments made.
+First of all I started using the microcontroller called STM32 which used C++ to control the
+butt-pot.
+This had the advantage of being a very low level programming language which ensured very
+quick processing of information of the microcontroller which is very important when controlling
+a flying vehicle or a flying robot.
+Nevertheless it had a couple of drawbacks.
+First of all it was very complex to program and it was not very compatible to other type
+of technologies.
+We also tried programming the pick-hawks module for flying drones but this had the great disadvantage
+that it was very hard to manipulate its core code and it was very hard to personalize the
+code and the functionality of the pick-hawk regarding our necessities.
+It had the advantage that it had a lot of modules and algorithms that were implemented
+and specific for drones but nevertheless as the experiments we were trying to do were
+completely brand new we needed to build a lot of our code from scratch in order for our
+whole system to work which the pick-hawk module made very hard to.
+For this reason we decided to use the microprocessor called the pi board running the micropython
+language.
+The micropython language is a programming language very similar to Python which is a
+high level language which is very easy to write and very comprehensible but micropython
+is made for optimization into microprocessors which means that it is not only very easy to
+program and very easy to understand which is a great advantage when you are doing programs
+from scratch but it also is quick enough and efficient enough to process all the information
+needed in order to control the bat bot.
+To the pi board was the AC05 magnetic encoder connected from which we calculated the wing
+angle as well as a PCA module used to control the four servos of the legs, two for each
+leg, the servo that controls the folding and unfolding of the wings as well as the DC motor
+used to control the flapping frequency.
+And as before mentioned the wireless communication was enabled thanks to the wireless UART module.

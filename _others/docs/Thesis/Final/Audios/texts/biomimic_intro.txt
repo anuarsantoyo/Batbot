@@ -1,0 +1,74 @@
+For future development of flapping wings robots, it's of great use to understand
+how bats are actually using their hind legs, which role do they play, which
+movements are needed to generate which kind of force. Of course in order to
+find these out is very hard because trying to command a bat to move the
+legs in the ways we desire is simply not possible and sometimes some movements
+are not naturally done or are not done when we want, when we're trying to
+experiment with real bats. This is a great advantage of using the bat bot.
+Because with the usage of the bat bot we can actually program and command the
+hind leg movements at our own will. This can help us understand and gain a better
+insight on the secrets that lie in the movement of the hind legs of the bats.
+That is why in this section we did a set of experiments in which we try to mimic
+the hind movements of the bats in order to understand and get better insight of
+the role at flying. As many parameters can be explored and different combinations
+can be tested, this can become overwhelming as a very large amount of
+different experiments would be needed in order to cover the whole range of
+different movement possibilities. That's why this is a great example of the
+advantage of the evolutionary algorithm system developed in this master thesis.
+Exactly for these kind of situations the technology developed in this master
+thesis can be of great advantage because we can save ourselves the time and more
+efficiently and more quickly gain understanding on the parameters that
+will prove to be of a resulting higher performance within flighting metrics.
+In order to achieve this we'd use the data of a bat measured within the
+dissertation thesis of Dr. Sudeep and used the information of this bat as inspiration
+and reference point. For this reason we needed to adapt the dimensions of the bat
+bot to best match the dimensions of the real bat. So what was done was analyze the
+wingspan of the real bat which was 440 millimeters and the length of its leg
+which was 40 millimeters. Then we calculated or better said measured the
+wingspan of the bat bot which was equal to 1446 millimeters. Using these three
+information and the rule of three we could then calculate the needed length in
+order to have a constant ratio between the wingspan and the leg. Therefore the
+resulting leg length needed was of 130 millimeters which was then adjusted to
+the bat bot. In order to obtain reliable and comparable data all the experiments
+that will be done from now on used the same input voltage of 11.6 volts as well
+that all the experiments had a duration of 10 seconds. With the length of 10
+seconds enough data and enough flapping cycles were able to be measured in order
+to have a reliable average calculation of the forces exerted by the bat bot.
+And this way we could exclude the possibility of certain measurements being
+out of sheer luck or of unique situations that happen within a flapping.
+10 seconds provide enough time to have enough flapping cycles to have a reliable
+average. Before continuing with the detailed explanation of each experiment I
+would like first to explain how the forces the resulting forces are
+calculated. On the next plot we can see the measurements taken by the sensor
+within an experiment. On the part A of the plot we can see colored in blue the
+measurements in the z direction which represents the vertical direction and in
+orange we can see the measurements in the y direction which could also be
+understood as the thrust. All the values are given in newtons. As you can see at
+the beginning and at the end of the measurements we can have the situation
+that a measurement is started or ended before a whole period has occurred. For
+this reason we needed to do a peak analysis first in order to identify the
+peak values of the force measurements. Once we know the peak values we can
+determine what a whole period represents in our data. So the idea of this
+analysis is to only use data that we know is part of a complete cycle. In
+order to achieve this only data that falls within the first found peak and
+the last found peak are used for the following analysis and resulting force
+calculations. Everything before the first peak and after the last peak is
+discarded. From this data a lot of interesting analysis can be made. For
+example on the right side of the plot we can see a plot that describes the
+trajectory of the resulting force throughout the experiment. In the z axis
+we can see that it's represented in the vertical axis of the plot and the y
+axis the y force is represented on the x axis of this plot. This way we can get
+an understanding of how the force behaves throughout the flapping cycles. From
+this data we can calculate the average force in z direction also known as the
+lift and the average force in the y direction known as thrust. If we combine
+these two we can get the vector of the resulting force and if we calculate
+using the Euclidean distance we can also calculate the magnitude of the
+resulting force and using arc tangents we can calculate as well the angle in
+which this force is being applied. Something else that we can also recover
+from this data analysis is the frequency. As we have already calculated the
+peak of the flapping cycles we can use all of these peaks and calculate the
+distance between each other and from that calculate the average distance which
+can also be understood as the period length and then by divided one divided
+by the average period length we can also calculate the average frequency of
+these specific tests which will be very useful in future analysis and in the
+coming experiments.

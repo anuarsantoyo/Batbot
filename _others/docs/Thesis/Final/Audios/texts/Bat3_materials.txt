@@ -1,0 +1,32 @@
+So, after doing the force analysis and realizing that the flapping frequency was not enough
+and the force that the bat could exert was not high enough to sustain its own body and
+that it needed the lift from the airfoil in order to sustain its own weight, we decided
+to do some improvements.
+Hence, we came to the version number three of the bat bot.
+The main mechanical upgrade that we did were basically two.
+First of all, we incorporated a second gear to the main axis of rotation that makes the
+wings flap.
+This had as a goal to increase the area of contact of the gears with each other, double
+as much, this way the stresses that the gears would feel would be half as much.
+This would allow us to obtain much higher flapping frequencies.
+What happens is that with increasing flapping frequencies, the wing speed also increases
+and the wind resistance, the force exerted by the wind on the wing, squares with increasing
+velocity, which means that by increasing the flapping frequency, the resistance of the
+wing quadratically increases and when the resistance of the wing is very strong, then
+the stresses that the gear finds can be very high.
+We saw this in several experiments in which the teeth of the gear broke.
+For this reason, adding a second gear helped us achieve higher flapping frequencies without
+the fear of the gear teeth breaking.
+This way we achieved a more robust and more reliable gear system on the bat bot.
+The second improvement that was designed after the results of the force analysis on the bat
+bot version number two, was the fact that naturally the highest speed obtained by the
+wings is when they have the neutral angle and there's a reduction of the speeds to zero
+when the direction of the wings change, namely at the end of the up stroke and at the end
+of the down stroke, which means that if we increase the amplitude of the flapping of the
+wing but remain with the same flapping frequencies, that would result in higher speeds being achieved
+particularly when crossing the neutral state or the neutral angle of the flapping wing.
+For this reason, the second change that we did was to extend by four millimeters the
+crane attached to the rotation axis so that the amplitude of the flapping of the wing
+could also be increased.
+These were the two main mechanical upgrades seen in the bat bot version number three.
+Compared to the version number two, all the electronic systems remained the same.

@@ -1,0 +1,9 @@
+In the paper Lagrangian Modeling and Flight Control of an Articulated Winged Bat
+bought, written by Alireza Raminasi, site Raminasi underscore 2015.
+A bat robot called B2 was developed, simulated the articulated skeleton of the bats, with
+the idea of understanding the connection between the bat's flight dynamic and the physiological
+and morphological specializations.
+A particularity of these thesis, or better said article, is that they also introduced
+a holonomical constrained Lagrangian model of the flapping robot, as well as a calculus
+of variation of the method of inverse dynamics, which were implied to synthesize the flight
+control algorithm of the flapping wings.
