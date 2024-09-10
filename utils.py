@@ -131,8 +131,8 @@ def fitness_avg_force(measurements, plot=False, args = {'peak_height':0, 'peak_d
         # Adding title and labels
         ax1.legend()
         ax1.set_title('Peaks found')
-        ax1.set_xlabel('Time')
-        ax1.set_ylabel('Force')
+        ax1.set_xlabel('Time [s]')
+        ax1.set_ylabel('Force [N]')
         # Setting up a simple plot with equal scaling on the axes
         # Setting the aspect of the plot to be equal.
         ax2.set_aspect('equal', adjustable='box')
@@ -265,7 +265,7 @@ def read_measurements_df_6axis(port='/dev/ttyUSB0', duration=10, calibration=Fal
 
         time_points.append(time.time() - (end_time - duration))  # Record the measurement time
 
-        time.sleep(0.003)  # Interval of 0.1 seconds
+        time.sleep(0.005)  # Interval of 0.1 seconds
 
     # Convert data to a DataFrame for easy plotting with Plotly Express
     labels = ['Fx', 'Fy', 'Fz', 'Mx', 'My', 'Mz']
